@@ -84,6 +84,7 @@ input.ref{color:var(--muted);font-size:13px;padding-top:0}input.refmain{font-wei
 .pick,#selAll{width:16px;height:16px;cursor:pointer;accent-color:#1c1917}#selbar{display:none;align-items:center;gap:28px;background:#1c1917;color:#fff;border-radius:10px;padding:12px 18px;margin:-6px 0 16px}#selbar b{font-size:16px}#selbar .m{color:#86efac}#selbar button{margin-left:auto;background:none;border:1px solid #57534e;color:#e7e5e4;border-radius:6px;padding:5px 10px;font:inherit;cursor:pointer}
 .infobtn{font:inherit;font-size:11px;font-weight:500;color:#78716c;background:#fff;border:1px solid #e7e5e4;border-radius:6px;padding:1px 7px;margin:2px 0 0 6px;cursor:pointer}.infobtn:hover{background:#1c1917;color:#fff}.infobtn.on{color:#1c1917;border-color:#a8a29e}
 #catview .czone{display:inline-flex;gap:2px;margin-right:6px}
+.dup{border:none;background:none;color:#a8a29e;font-size:15px;padding:4px 6px;cursor:pointer}.dup:hover{color:#1c1917}
 /* === Affichage téléphone uniquement (ignoré sur PC/Mac) === */
 @media (max-width:760px){
 body{font-size:15px}
@@ -120,7 +121,7 @@ main{padding:14px 14px 40px}
 .tablewrap .img{width:100%;height:auto;aspect-ratio:1/1;max-height:240px;border-radius:12px}
 #catview td img,#catview .noimg{width:100%;height:auto;aspect-ratio:1/1;max-height:240px;border-radius:12px}
 .tablewrap tbody td:has(.grip),.tablewrap tbody td:has(.pick){position:absolute;top:8px;right:8px;padding:0;z-index:3;background:rgba(255,255,255,.85);border-radius:8px}
-.tablewrap tbody td:has(.del){grid-column:1/-1;text-align:right}
+.tablewrap tbody td:has(.del){grid-column:1/-1;text-align:right}.tablewrap .dup::after{content:" Dupliquer";font-size:13px}
 .tablewrap .grip{display:none}
 .tablewrap tbody td:has(textarea),.tablewrap tbody td:has(.cote),.tablewrap tbody td:has(.w-notes),.tablewrap tbody td:has(.w-model),.tablewrap tbody td:has(.refmain){grid-column:1/-1}
 .tablewrap input,.tablewrap select,.tablewrap textarea{width:100%!important;font-size:15px;border:1px solid var(--line2);background:#fcfcfb;padding:8px}
@@ -289,7 +290,7 @@ function renderTable(){
     <td><div class="status"><span class="dot s${si}"></span><select data-f="status" class="w-sel">${STATUTS.map(s=>`<option ${s===r.status?'selected':''}>${s}</option>`).join('')}</select></div></td>
     <td>${sel('recheck',r.recheck||'Non',OPTS.recheck,'w-sel '+((r.recheck||'Non')==='À re-chercher'?'np':''))}</td>
     <td><input data-f="ccomment" class="w-notes" value="${esc(r.ccomment||'')}" placeholder="Visible par le client"></td>
-    <td><button class="del" title="Supprimer">×</button></td><td><span class="grip" draggable="true" title="Glisser pour déplacer">⋮⋮</span></td></tr>`}).join('')}
+    <td style="white-space:nowrap"><button class="dup" data-dup="${r.id}" title="Dupliquer cette montre">⧉</button><button class="del" title="Supprimer">×</button></td><td><span class="grip" draggable="true" title="Glisser pour déplacer">⋮⋮</span></td></tr>`}).join('')}
   </tbody><tfoot><tr><td colspan="8">Total</td><td class="money">${sum(r=>num(r.asked))}</td><td></td><td class="money">${sum(r=>num(r.market))}</td><td></td><td class="money">${sum(sale)}</td><td class="money">${sum(r=>num(r.freight))}</td><td class="money">${sum(r=>cost(r)+num(r.freight))}</td><td class="marge pos">${sum(marge)}</td><td colspan="8"></td></tr></tfoot></table>`;
   bindRows();
 }
@@ -609,6 +610,9 @@ function catCote(x){const P=catProxy(x);const c=coteOf(P);const o=((x.offers||{}
  const pr=has(x.price)?num(x.price):0;const src=[(x.c24Hist||[]).some(h=>h.z===catZone&&h.q)?'Chrono24':'',(x.wsHist||[]).some(h=>(h.z||'International')===catZone)?'WatchSalon':''].filter(Boolean).join(' + ');
  return `<img src="${curveImg(P,130,36)}" width="130" height="36" alt="" style="display:block;width:130px;height:36px;border-radius:0;background:none;object-fit:fill"><div style="font-size:11.5px;white-space:nowrap">Marché <b>${eur(c)}</b>${pr?' · '+vsCote(P):''}</div>${pr&&c>pr?`<div style="font-size:11.5px;color:#15803d;font-weight:600">Marge possible ≈ ${eur(c-pr)}</div>`:''}<div style="font-size:10.5px;color:#a8a29e">${src} · ${catZone==='Europe'?'Europe':'monde'}</div>${o.length?`<button class="offbtn" data-id="${x.id}">${o.length} offres · dès ${eur(o[0].p)}</button>`:''}`}
 document.addEventListener('click',e=>{const z=e.target.closest&&e.target.closest('[data-cz]');if(z){catZone=z.dataset.cz;try{localStorage.setItem('srcCatZone',catZone)}catch(_){}renderCatalog();return}const b=e.target.closest&&e.target.closest('#catImp');if(b)document.getElementById('importAd').onclick()});
+
+// ===== Dupliquer une montre dans un dossier =====
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-dup]');if(!b)return;const d=cur();const i=d.rows.findIndex(x=>x.id===b.dataset.dup);if(i<0)return;const c=JSON.parse(JSON.stringify(d.rows[i]));c.id=uid();c.sel=false;d.rows.splice(i+1,0,c);save();render();const tr=document.querySelector('tr[data-id="'+c.id+'"]');if(tr){tr.scrollIntoView({block:'center',behavior:'smooth'});tr.style.transition='background .8s';tr.querySelectorAll('td').forEach(td=>td.style.background='#fef9c3');setTimeout(()=>tr.querySelectorAll('td').forEach(td=>td.style.background=''),1200)}});
 </script>
 </body>
 </html>
