@@ -274,7 +274,7 @@ function renderTable(){
     <td><input type="checkbox" class="pick" ${r.sel?'checked':''}></td>
     <td><div class="img" tabindex="0" title="Cliquez puis collez une image">${r.img?`<img src="${r.img}" alt="">`:'+'}</div></td>
     <td><input data-f="brand" class="w-brand" value="${esc(r.brand||'')}" placeholder="Maison"></td>
-    <td class="w-model"><input data-f="ref" class="refmain" value="${esc(r.ref)}" placeholder="Référence"><input data-f="model" class="ref" value="${esc(r.model)}" placeholder="Modèle (optionnel)"><button class="infobtn${r.info&&Object.keys(r.info).length?' on':''}" data-info="${r.id}" title="Fiche technique">ⓘ Info</button><button class="infobtn" data-paris="${esc(r.ref||'')}" title="Chercher cette montre dans les boutiques de Paris">📍 Paris</button></td>
+    <td class="w-model"><input data-f="ref" class="refmain" value="${esc(r.ref)}" placeholder="Référence"><input data-f="model" class="ref" value="${esc(r.model)}" placeholder="Modèle (optionnel)"><button class="infobtn${r.info&&Object.keys(r.info).length?' on':''}" data-info="${r.id}" title="Fiche technique">ⓘ Info</button></td>
     <td>${sel('seller',r.seller||'Non précisé',OPTS.seller)}</td>
     <td><input data-f="country" class="w-country" value="${esc(r.country)}" placeholder="Pays"></td>
     <td><input data-f="year" class="num" style="width:70px;text-align:left" inputmode="numeric" value="${esc(r.year||'')}" placeholder="—"></td>
@@ -630,13 +630,54 @@ function openParis(ref){const m=document.createElement('div');m.id='catm';docume
   const allLinks=q?grp.map((g,i)=>`<a class="btn" style="text-decoration:none;display:inline-block" target="_blank" rel="noopener" href="${gq('"'+q+'" ('+g.map(s=>'"'+s[1].replace(/ (Saint-Germain|Champs-Élysées|La Samaritaine|Galeries Lafayette|Printemps Homme|Occasion)$/,'')+'"').join(' OR ')+')')}">Google · boutiques ${i*6+1}-${i*6+g.length}</a>`).join(' ')+` <a class="btn" style="text-decoration:none;display:inline-block" target="_blank" rel="noopener" href="https://www.chrono24.fr/search/index.htm?query=${encodeURIComponent(q)}&dosearch=true">Chrono24</a>`:'<span style="color:#a8a29e">Tapez une référence ou un nom de montre.</span>';
   m.innerHTML=`<div class="box" style="max-width:860px"><button class="mini" id="p_x" style="float:right">Fermer</button><h3>Chercher à Paris</h3>
   <div style="display:flex;gap:8px;margin-bottom:10px"><input id="p_ref" value="${esc(q)}" placeholder="Référence ou nom (ex. 126500LN, Daytona Panda)" style="flex:1;border:1px solid #e7e5e4;border-radius:7px;padding:9px 11px;background:#fff;font-size:15px"><button class="btn primary" id="p_go">Chercher</button></div>
-  <div style="font-size:12.5px;color:#78716c;margin-bottom:6px"><b>1. Recherche groupée</b> : toutes les boutiques d’occasion d’un coup (s’ouvre dans un nouvel onglet).</div>
+  <div id="p_auto"></div><div style="font-size:12.5px;color:#78716c;margin-bottom:6px"><b>Recherche manuelle</b> (Google) : toutes les boutiques d’occasion d’un coup.</div>
   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">${allLinks}</div>
-  <div style="font-size:12.5px;color:#78716c;margin-bottom:6px"><b>2. Boutique par boutique</b> · « Numéro » ouvre la fiche Google Maps (téléphone, horaires, itinéraire ; sur téléphone : bouton Appeler).</div>
+  <div style="font-size:12.5px;color:#78716c;margin-bottom:6px"><b>Boutique par boutique</b> · « Numéro » ouvre la fiche Google Maps (téléphone, horaires, itinéraire ; sur téléphone : bouton Appeler).</div>
   ${Object.keys(PCAT).map(c=>`<div style="font-weight:600;font-size:13px;margin:12px 0 6px">${PCAT[c]}</div><table style="width:100%;border-collapse:collapse;font-size:13px">${PARIS.filter(s=>s[0]===c).map(s=>`<tr style="border-top:1px solid #f0efed"><td style="padding:6px 4px"><b>${esc(s[1])}</b><div style="color:#a8a29e;font-size:11.5px">${esc(s[2])}</div></td><td style="padding:6px 4px;white-space:nowrap;text-align:right">${q?`<a class="mini" style="text-decoration:none;color:inherit;display:inline-block" target="_blank" rel="noopener" href="${gq((s[3]?'site:'+s[3]+' ':'"'+s[1].replace(/ (Saint-Germain|Champs-Élysées|La Samaritaine|Galeries Lafayette|Printemps Homme|Occasion)$/,'')+'" ')+q)}">Chercher</a> `:''}<a class="mini" style="text-decoration:none;color:inherit;display:inline-block" target="_blank" rel="noopener" href="${gmap(s[1],s[2])}">📞 Numéro</a></td></tr>`).join('')}</table>`).join('')}</div>`;
-  m.querySelector('#p_x').onclick=close;const go=()=>{ref=m.querySelector('#p_ref').value;draw()};m.querySelector('#p_go').onclick=go;m.querySelector('#p_ref').onkeydown=e=>{if(e.key==='Enter')go()}};
+  m.querySelector('#p_x').onclick=close;runAuto(q,m.querySelector('#p_auto'));const go=()=>{ref=m.querySelector('#p_ref').value;draw()};m.querySelector('#p_go').onclick=go;m.querySelector('#p_ref').onkeydown=e=>{if(e.key==='Enter')go()}};
  draw()}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-paris]');if(!b)return;openParis(b.dataset.paris||'')});
+// ===== Recherche automatique dans les boutiques de Paris (via l'extension) =====
+const AUTO=[
+ {n:'Cresus',d:'https://www.cresus.fr',p:'Cresus Paris'},
+ {n:'Collector Square',d:'https://www.collectorsquare.com',p:'Collector Square'},
+ {n:'Miller',d:'https://www.miller.fr',p:'Miller'},
+ {n:'Romain Réa',d:'https://romainrea.com',p:'Romain Réa Saint-Germain'},
+ {n:'GP Vintage (Godechot Pauliet)',d:'https://www.godechot-pauliet.com',p:'GP Vintage'},
+ {n:'Kronos 360',d:'https://www.kronos360.com',p:'Kronos 360 Printemps Homme',s:['/fr/recherche?controller=search&s=']},
+ {n:'Lassaussois Les Montres',d:'https://www.boutiquelesmontres.com',p:'Les Montres Collector Lassaussois'},
+ {n:'Laurent Barrier',d:'https://www.laurent-barrier.com',p:'Laurent Barrier Occasion'},
+ {n:'Euro Art & Collection',d:'https://euroartcollection.com',p:'Euro Art & Collection'},
+ {n:'Montres Mania',d:'https://montresmania.com',p:'Montres Mania',s:['/?post_type=product&s=']}
+];
+const hasExt=()=>document.documentElement.dataset.srcExt==='1';
+let _xid=0;const _xw={};window.addEventListener('message',e=>{const m=e.data;if(e.source===window&&m&&m.src==='sourcing-ext'&&_xw[m.id]){_xw[m.id](m.res);delete _xw[m.id]}});
+const extFetch=(url,json)=>new Promise(ok=>{const id=++_xid;_xw[id]=ok;window.postMessage({src:'sourcing',type:'fetch',id,url,json:!!json},'*');setTimeout(()=>{if(_xw[id]){delete _xw[id];ok({ok:false,error:'délai dépassé'})}},25000)});
+const PRICE_RE=/(\d{1,3}(?:[\s.  ']\d{3})+|\d{4,7})(?:[,.]\d{1,2})?\s?(?:€|EUR)|€\s?(\d{1,3}(?:[\s.  ',]\d{3})+|\d{4,7})/;
+const priceOf=t=>{const m=String(t||'').match(PRICE_RE);if(!m)return 0;return parseInt((m[1]||m[2]).replace(/[^\d]/g,''),10)||0};
+function matchQ(q,txt){const R=NREF(q);const isRef=/\d{3,}/.test(q);if(isRef){const T=NREF(txt);const core=R.replace(/^(\d+[A-Z]*)\b.*$/,'$1');return T.includes(R)||(core.length>=5&&T.includes(core))}const N=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();return N(q).split(/\s+/).filter(Boolean).every(w=>N(txt).includes(w))}
+function extractCards(html,base,q){const doc=new DOMParser().parseFromString(html,'text/html');const host=new URL(base).host.replace(/^www\./,'');const out=new Map();
+ doc.querySelectorAll('a[href]').forEach(a=>{let u;try{u=new URL(a.getAttribute('href'),base)}catch(_){return}if(!u.host.replace(/^www\./,'').endsWith(host)||/search|recherche|[?&]s=|\/cart|\/compte|\/account|#/.test(u.pathname+u.search+u.hash)||u.pathname.length<3)return;
+  let c=a;for(let i=0;i<6&&c.parentElement;i++){if(priceOf(c.textContent)||/sur demande|on request/i.test(c.textContent))break;c=c.parentElement}
+  const txt=(c.textContent||'').replace(/\s+/g,' ').trim();if(txt.length>1500)return;const full=txt+' '+u.pathname+' '+(a.getAttribute('title')||'');if(!matchQ(q,full))return;
+  const img=c.querySelector('img');let src=img&&(img.getAttribute('data-src')||img.getAttribute('src')||(img.getAttribute('srcset')||'').split(' ')[0])||'';try{if(src)src=new URL(src,base).href}catch(_){src=''}
+  const title=((a.textContent||'').replace(/\s+/g,' ').trim()||(img&&img.getAttribute('alt'))||txt).slice(0,140);const k=u.origin+u.pathname;const prev=out.get(k);const p=priceOf(txt);
+  if(!prev||(!prev.p&&p)||(title.length>prev.t.length&&title.length<140))out.set(k,{t:title,p:p||(prev&&prev.p)||0,u:k,img:src||(prev&&prev.img)||''})});
+ return [...out.values()].slice(0,20)}
+async function searchShop(s,q){const enc=encodeURIComponent(q);
+ const home=await extFetch(s.d+'/');if(!home.ok&&!home.text)return{err:home.status===403||home.status===429?'bloque les robots':'site injoignable'};
+ const html=home.text||'';
+ if(/cdn\.shopify\.com|Shopify\.theme/i.test(html)){const r=await extFetch(s.d+'/search/suggest.json?q='+enc+'&resources[type]=product&resources[limit]=10',true);try{const j=JSON.parse(r.text);const P=((j.resources||{}).results||{}).products||[];return{list:P.filter(x=>matchQ(q,(x.title||'')+' '+(x.handle||'')+' '+(x.body||''))).map(x=>({t:x.title,p:Math.round(parseFloat(x.price||x.price_min||0))||0,u:new URL(x.url,s.d).href.split('?')[0],img:x.image?new URL(x.image,s.d).href:''}))}}catch(_){}}
+ const cands=[...(s.s||[])];try{const doc=new DOMParser().parseFromString(html,'text/html');const f=[...doc.querySelectorAll('form')].find(f=>f.querySelector('input[type=search],input[name=q],input[name=s],input[name=search],input[name=query],input[name=keyword],input[name=search_query]'));if(f&&(f.getAttribute('method')||'get').toLowerCase()==='get'){const inp=f.querySelector('input[type=search],input[name=q],input[name=s],input[name=search],input[name=query],input[name=keyword],input[name=search_query]');const act=new URL(f.getAttribute('action')||'/',s.d);const ps=new URLSearchParams();f.querySelectorAll('input[type=hidden]').forEach(h=>{if(h.name)ps.set(h.name,h.value)});ps.set(inp.name,'__Q__');cands.unshift(act.origin+act.pathname+'?'+ps.toString().replace('__Q__','')+'')}}catch(_){}
+ cands.push('/search?q=','/recherche?q=','/?s=','/catalogsearch/result/?q=');
+ let tried=0;for(const c of [...new Set(cands)]){const url=(c.startsWith('http')?c:s.d+c)+enc;const r=await extFetch(url);tried++;if(!r.text)continue;if(r.status===403||r.status===429)return{err:'bloque les robots'};const L=extractCards(r.text,r.url||url,q);if(L.length||tried>=3)return{list:L};}
+ return{list:[]}}
+async function runAuto(q,box){if(!q.trim()){box.innerHTML='';return}
+ if(!hasExt()){box.innerHTML='<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#92400e">Recherche automatique : <b>installez l’extension « Sourcing · Recherche Paris »</b> dans Chrome (PC / Mac), puis rechargez la page.</div>';return}
+ const st={},res=[];const draw=()=>{const L=res.slice().sort((a,b)=>(a.p||9e9)-(b.p||9e9));
+  box.innerHTML=`<div style="font-size:12.5px;color:#78716c;margin-bottom:6px"><b>Résultats automatiques</b> · ${AUTO.map(s=>`<span style="white-space:nowrap">${esc(s.n)} ${st[s.n]===undefined?'⏳':st[s.n].err?'<span style="color:#b45309" title="'+esc(st[s.n].err)+'">⚠</span>':'<b>'+st[s.n].n+'</b>'}</span>`).join(' · ')}</div>
+  ${L.length?`<div style="display:grid;gap:8px;margin-bottom:14px">${L.map(x=>{const sh=PARIS.find(p=>p[1]===x.shop.p);return `<div style="display:flex;gap:10px;align-items:center;border:1px solid #e7e5e4;border-radius:10px;padding:8px;background:#fff">${x.img?`<img src="${esc(x.img)}" style="width:58px;height:58px;object-fit:cover;border-radius:8px;flex:none" referrerpolicy="no-referrer" onerror="this.style.display='none'">`:''}<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${esc(x.t)}</div><div style="font-size:12px;color:#78716c">${esc(x.shop.n)}${sh?' · '+esc(sh[2]):''}</div></div><div style="text-align:right;white-space:nowrap"><div style="font-weight:700">${x.p?eur(x.p):'Prix sur demande'}</div><a class="mini" href="${esc(x.u)}" target="_blank" rel="noopener">Voir</a> ${sh?`<a class="mini" href="${gmap(sh[1],sh[2])}" target="_blank" rel="noopener">📞</a>`:''}</div></div>`}).join('')}</div>`:(Object.keys(st).length===AUTO.length?'<div style="color:#a8a29e;font-size:13px;margin-bottom:14px">Aucune montre trouvée dans ces boutiques pour cette recherche.</div>':'')}`};
+ draw();await Promise.all(AUTO.map(async s=>{try{const r=await searchShop(s,q);if(r.err)st[s.n]={err:r.err};else{st[s.n]={n:r.list.length};r.list.forEach(x=>res.push(Object.assign(x,{shop:s})))}}catch(e){st[s.n]={err:'erreur'}}draw()}))}
 </script>
 </body>
 </html>
