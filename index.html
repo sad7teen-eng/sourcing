@@ -762,6 +762,35 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
  if(state.view==='cat'){state.catalog=state.catalog||[];state.catalog.push({id:uid(),brand,ref,model:x.t,year:'',price:x.p?String(x.p):'',neg:'',condition:'Occasion',fullset:fs,location:loc,apporteur:x.shop.n,status:'Disponible',notes:'Annonce : '+x.u,img:x.img||'',media:[],added:new Date().toISOString().slice(0,10)});save();renderCatalog();}
  else{cur().rows.push({id:uid(),zone,brand,img:x.img||'',model:x.t,ref,country:loc,link:x.u,asked:x.p?String(x.p):'',negotiated:'',market:'',sale:'',freight:'',condition:'Occasion',fullset:fs,polish:'Non précisé',recheck:'Non',service:'',status:'À contacter',notes:'',seller:'Boutique'});save();render();}
  b.textContent='Ajoutée ✓';b.disabled=true;b.style.background='#15803d';b.style.borderColor='#15803d'});
+// ===== Coller un lien d'annonce = remplissage automatique de la ligne (extension requise) =====
+function toast(t,ms){let el=document.getElementById('srcToast');if(!el){el=document.createElement('div');el.id='srcToast';el.style.cssText='position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1c1917;color:#fff;padding:10px 16px;border-radius:10px;font:500 13px system-ui,sans-serif;z-index:99999;max-width:90vw;box-shadow:0 8px 30px rgba(0,0,0,.25)';document.body.appendChild(el)}el.textContent=t;el.style.display='block';clearTimeout(el._t);if(ms)el._t=setTimeout(()=>el.style.display='none',ms)}
+function parseListing(html,url){const d=new DOMParser().parseFromString(html,'text/html');const T=s=>String(s||'').replace(/\s+/g,' ').trim();const o={};
+ const meta=n=>{const m=d.querySelector(`meta[property="${n}"],meta[name="${n}"]`);return m?T(m.getAttribute('content')):''};
+ // JSON-LD
+ d.querySelectorAll('script[type="application/ld+json"]').forEach(s=>{try{let j=JSON.parse(s.textContent);const arr=[].concat(j['@graph']||j);arr.forEach(x=>{if(!x||!/Product|Offer|IndividualProduct/i.test([].concat(x['@type']).join(' ')))return;o.name=o.name||T(x.name);const b=x.brand;o.brand=o.brand||T(typeof b==='string'?b:b&&b.name);o.mpn=o.mpn||T(x.mpn||x.model&&(x.model.name||x.model)||'');const of=[].concat(x.offers||[])[0]||{};const pr=of.price||of.lowPrice||(of.priceSpecification||{}).price;if(pr&&!o.price)o.price=Math.round(+String(pr).replace(',','.'));o.img=o.img||T([].concat(x.image||[])[0]);o.desc=o.desc||T(x.description)})}catch(_){}});
+ // tableaux libellé / valeur (Chrono24 et autres)
+ const kv={};d.querySelectorAll('tr').forEach(tr=>{const c=tr.querySelectorAll('td,th');if(c.length>=2){const k=T(c[0].textContent).toLowerCase(),v=T(c[1].textContent);if(k&&v&&k.length<40&&!kv[k])kv[k]=v}});
+ d.querySelectorAll('dt').forEach(dt=>{const dd=dt.nextElementSibling;if(dd){const k=T(dt.textContent).toLowerCase();if(k&&!kv[k])kv[k]=T(dd.textContent)}});
+ const g=(...ks)=>{for(const k of ks){for(const kk in kv)if(kk===k||kk.startsWith(k))return kv[kk]}return ''};
+ const title=T((d.querySelector('h1')||{}).textContent)||meta('og:title')||o.name||'';const body=T(d.body?d.body.textContent:'');const desc=o.desc||meta('og:description')||'';
+ const r={};r.brand=g('marque','brand')||o.brand||'';r.model=g('modèle','model')||'';r.ref=g('numéro de référence','référence','reference number','reference','réf')||o.mpn||'';
+ r.title=title;const yr=g('année de fabrication','year of production','année','year');r.year=(yr.match(/(19|20)\d\d/)||[])[0]||((title+' '+desc).match(/\b(19[4-9]\d|20[0-2]\d)\b/)||[])[0]||'';
+ let pr=0;const ps=g('prix','price');if(ps){const m=ps.match(/(\d{1,3}(?:[\s  .']\d{3})+|\d{3,7})/);if(m)pr=+m[1].replace(/\D/g,'')}r.price=o.price||pr||0;
+ const et=g('état','condition');r.cond=/non porté|neuf|unworn|new/i.test(et)?'Neuve':/très bon|excellent|comme neuf|very good|like new/i.test(et)?'Occasion (très bon)':et?'Occasion':'';
+ const ct=(g('contenu livré','scope of delivery','contenu')+' '+title+' '+desc).toLowerCase();const box=/coffret|bo[iî]te|box|écrin|ecrin/.test(ct)&&!/sans (coffret|bo[iî]te)|no box|without box/.test(ct),pap=/papiers|papers|certificat|garantie|warranty card/.test(ct)&&!/sans papiers|no papers|without papers/.test(ct);r.fullset=/full.?set/.test(ct)?'Full set':box&&pap?'Full set':pap?'Montre + papiers':box?'Montre + boîte':g('contenu livré','scope of delivery')?'Montre seule':'';
+ const all=(title+' '+desc+' '+body).toLowerCase();r.polish=/jamais poli|non poli|unpolish|never polish|not polished|pas poli/.test(all)?'Jamais polie':/l[ée]g[eè]rement poli|polissage l[ée]ger|light(ly)? polish/.test(all)?'Polissage léger':/\bpolie?\b|\bpolished\b|polissage/.test(all)?'Polie':'';
+ const loc=g('emplacement','location','localisation');r.country=loc?loc.split(',')[0].trim()+(/paris/i.test(loc)?' (Paris)':''):'';
+ if(/chrono24\./.test(url))r.seller=/vendeur particulier|private seller/i.test(body)?'Particulier':'Boutique';else{try{const host=new URL(url).host.replace(/^www\./,'');const shop=AUTO.find(s=>s.d&&s.d.includes(host));if(shop){r.country=r.country||'France (Paris)';r.seller='Boutique'}if(/leboncoin|vinted|ebay|2ememain|marktplaats/.test(host))r.seller='Particulier'}catch(_){}}
+ r.img=meta('og:image')||o.img||'';if(!r.brand)r.brand=guessBrand(title);if(!r.model&&title)r.model=title.replace(new RegExp('^'+(r.brand||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i'),'').trim().slice(0,90);
+ return r}
+async function autoFillLink(id,url){if(!/^https?:\/\//.test(url))return;let row=null;for(const d of state.dossiers){row=d.rows.find(x=>x.id===id);if(row)break}if(!row)return;
+ if(document.documentElement.dataset.srcExt!=='1'){toast('Lien enregistré. Pour remplir la ligne automatiquement, installez l’extension (PC / Mac).',4500);return}
+ toast('Lecture de l’annonce…');const res=await extFetch(url.replace('://www.chrono24.com/','://www.chrono24.fr/'));if(!res.text){toast('Impossible de lire cette annonce ('+(res.status||res.error||'erreur')+').',4500);return}
+ const r=parseListing(res.text,res.url||url);const set=(k,v)=>{if(v)row[k]=String(v)};const before=JSON.stringify(row);
+ set('brand',r.brand);set('model',r.model);set('ref',r.ref);set('year',r.year);if(r.price)row.asked=String(r.price);set('country',r.country);set('seller',r.seller);set('condition',r.cond);set('fullset',r.fullset);set('polish',r.polish);if(r.img&&!/^data:/.test(row.img||''))row.img=r.img;
+ const n=['brand','model','ref','year','asked','country','seller','condition','fullset','polish'].filter(k=>row[k]&&row[k]!=='Non précisé').length;save();render();
+ toast(JSON.stringify(row)!==before?'Annonce lue : '+[r.brand,r.ref,r.year,r.price?eur(r.price):''].filter(Boolean).join(' · ')+(r.polish?' · '+r.polish:''):'Annonce lue, mais aucune info trouvée.',5000)}
+document.addEventListener('change',e=>{const i=e.target;if(!i||!i.matches||!i.matches('input[data-f="link"]'))return;const tr=i.closest('tr[data-id]');if(!tr)return;const id=tr.dataset.id,u=i.value.trim();setTimeout(()=>autoFillLink(id,u),50)},true);
 </script>
 </body>
 </html>
