@@ -82,6 +82,67 @@ input.ref{color:var(--muted);font-size:13px;padding-top:0}input.refmain{font-wei
 .c-green input{background:#dcfce7!important;color:#166534;font-weight:600}.c-yellow input{background:#fef9c3!important;color:#854d0e;font-weight:600}.c-red input{background:#fee2e2!important;color:#991b1b;font-weight:600}
 .grip{cursor:grab;color:#a8a29e;font-size:16px;letter-spacing:-3px;padding:4px 6px;user-select:none;border-radius:5px}.grip:hover{background:#f2f1ef;color:#1c1917}tr.drop-over td{border-top:2px solid #1c1917}tr.dragging{opacity:.4}
 .pick,#selAll{width:16px;height:16px;cursor:pointer;accent-color:#1c1917}#selbar{display:none;align-items:center;gap:28px;background:#1c1917;color:#fff;border-radius:10px;padding:12px 18px;margin:-6px 0 16px}#selbar b{font-size:16px}#selbar .m{color:#86efac}#selbar button{margin-left:auto;background:none;border:1px solid #57534e;color:#e7e5e4;border-radius:6px;padding:5px 10px;font:inherit;cursor:pointer}
+/* === Affichage téléphone uniquement (ignoré sur PC/Mac) === */
+@media (max-width:760px){
+body{font-size:15px}
+.app{display:block}
+aside{border-right:0;border-bottom:1px solid var(--line);padding:10px 12px 8px;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;gap:6px;align-items:center;position:sticky;top:0;z-index:40;background:var(--bg);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+aside::-webkit-scrollbar{display:none}
+aside .brand{padding:0 6px 0 2px;flex:none}
+aside .label{display:none}
+aside #dossiers{display:flex;gap:6px;flex:none}
+aside .dossier{flex:none;white-space:nowrap;border:1px solid var(--line);background:var(--white);border-radius:20px;padding:7px 12px;gap:8px}
+aside .dossier.active{background:var(--text);color:#fff;border-color:var(--text)}aside .dossier.active .count{color:#d6d3d1}
+aside #catNav{margin-bottom:0!important}
+aside .linkbtn{flex:none;white-space:nowrap;padding:7px 10px}
+aside .side-bottom{margin-top:0;flex-direction:row;flex:none;gap:2px}
+aside #exportBtn,aside #importBtn{display:none}
+main{padding:14px 14px 40px}
+.top{flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.top h2{flex:1 0 100%;font-size:24px}
+.top .btn{font-size:13px;padding:9px 11px;flex:1 1 auto}
+#pdfBroker{display:none}
+.stats{flex-wrap:wrap;gap:12px 22px;margin-bottom:14px;padding-bottom:14px}
+.stat .v{font-size:18px}
+.filters{overflow-x:auto;flex-wrap:nowrap}
+.chip{padding:8px 12px;font-size:14px;white-space:nowrap}
+.hint{display:none}
+.tablewrap{max-height:none;overflow:visible;border:0;background:none;border-radius:0}
+.tablewrap table,.tablewrap tbody,.tablewrap tfoot,#catview table,#catview tbody{display:block;width:100%;min-width:0}
+.tablewrap thead,#catview thead{display:none}
+.tablewrap tbody tr,#catview tbody tr{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;position:relative}
+.tablewrap tbody td,#catview tbody td{display:block;border:0;padding:4px 2px;min-width:0;white-space:normal}
+.tablewrap tbody td::before,#catview tbody td::before{content:attr(data-l);display:block;font-size:11px;color:var(--soft);font-weight:500;margin-bottom:1px}
+.tablewrap tbody td[data-l=""]::before,#catview tbody td[data-l=""]::before{display:none}
+.tablewrap tbody td:has(.img),.tablewrap tbody td:has(.gal),#catview tbody td:has(.gal){grid-column:1/-1}
+.tablewrap .img{width:100%;height:auto;aspect-ratio:1/1;max-height:240px;border-radius:12px}
+#catview td img,#catview .noimg{width:100%;height:auto;aspect-ratio:1/1;max-height:240px;border-radius:12px}
+.tablewrap tbody td:has(.grip),.tablewrap tbody td:has(.pick){position:absolute;top:8px;right:8px;padding:0;z-index:3;background:rgba(255,255,255,.85);border-radius:8px}
+.tablewrap tbody td:has(.del){grid-column:1/-1;text-align:right}
+.tablewrap .grip{display:none}
+.tablewrap tbody td:has(textarea),.tablewrap tbody td:has(.cote),.tablewrap tbody td:has(.w-notes),.tablewrap tbody td:has(.w-model),.tablewrap tbody td:has(.refmain){grid-column:1/-1}
+.tablewrap input,.tablewrap select,.tablewrap textarea{width:100%!important;font-size:15px;border:1px solid var(--line2);background:#fcfcfb;padding:8px}
+.tablewrap input.num{text-align:left}
+.tablewrap .money,.tablewrap .marge{text-align:left}
+.tablewrap .cote img{max-width:100%;height:auto}.tablewrap .cote div{white-space:normal}.tablewrap td>div{max-width:100%}
+.tablewrap .link input{width:100%}
+.tablewrap tfoot{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:10px}
+.tablewrap tfoot tr{display:flex;flex-wrap:wrap;gap:6px 14px}
+.tablewrap tfoot td{position:static;border:0;padding:2px}
+.tablewrap tfoot td:empty{display:none}
+#catview .ctop{flex-wrap:wrap}#catview .ctop h2{flex:1 0 100%}
+#catview .cflt input.q{min-width:0;flex:1 0 100%}
+#catview tbody td:has(.mini),#catview tbody td:last-child{grid-column:1/-1}
+#catview .mini{padding:8px 12px;font-size:13px}
+#catview .st{padding:6px 12px}
+#catm,#offm{padding:0}
+#catm .box,#offm .box{border-radius:0;min-height:100vh;padding:16px 14px 40px;max-width:none!important}
+#catm .grid{grid-template-columns:1fr}
+#catm input,#catm select,#catm textarea{font-size:16px}
+#offm table{display:block;overflow-x:auto}
+button.btn,.mini,.linkbtn{min-height:40px}
+#syncBanner{font-size:14px!important}
+}
 </style>
 </head>
 <body>
@@ -500,6 +561,9 @@ document.getElementById('exportBtn').onclick=()=>{const b=new Blob([JSON.stringi
 document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
 document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const s=JSON.parse(t);if(!s.dossiers)throw 0;if(confirm('Remplacer les données actuelles ?')){state=s;save();render()}}catch(_){alert('Fichier invalide.')}})};
 render();
+
+// Téléphone uniquement : étiquettes des cases (le PC n'exécute rien de ceci)
+if(window.matchMedia&&matchMedia('(max-width:760px)').matches){const lab=()=>{document.querySelectorAll('.tablewrap table,#catview table').forEach(t=>{const hs=[...t.querySelectorAll('thead th')].map(th=>th.textContent.trim());t.querySelectorAll('tbody tr').forEach(tr=>[...tr.children].forEach((td,i)=>{const v=hs[i]||'';if(td.getAttribute('data-l')!==v)td.setAttribute('data-l',v)}))})};let _lt=null;new MutationObserver(()=>{clearTimeout(_lt);_lt=setTimeout(lab,30)}).observe(document.body,{childList:true,subtree:true});setTimeout(lab,500)}
 </script>
 </body>
 </html>
