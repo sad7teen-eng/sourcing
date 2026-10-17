@@ -172,6 +172,7 @@ button.btn,.mini,.linkbtn{min-height:40px}
       <button class="btn" id="pdfClient">Export PDF client</button>
       
        <button class="btn" id="importAd">Importer une annonce Chrono24</button>
+      <button class="btn" data-paris="">Boutiques Paris</button>
       <button class="btn primary" id="addRow">Ajouter une montre</button>
     </div>
     <div class="stats" id="cards"></div>
@@ -297,7 +298,7 @@ function renderTable(){
   bindRows();
 }
 let dragId=null;
-function bindDrag(){document.querySelectorAll('tbody tr').forEach(tr=>{const g=tr.querySelector('.grip');
+function bindDrag(){document.querySelectorAll('#tablewrap tbody tr').forEach(tr=>{const g=tr.querySelector('.grip');if(!g)return;
  g.addEventListener('dragstart',e=>{dragId=tr.dataset.id;tr.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','row');try{e.dataTransfer.setDragImage(tr,20,20)}catch(_){}});
  g.addEventListener('dragend',()=>{dragId=null;tr.classList.remove('dragging');document.querySelectorAll('.drop-over').forEach(x=>x.classList.remove('drop-over'))});
  tr.addEventListener('dragover',e=>{if(!dragId)return;e.preventDefault();document.querySelectorAll('.drop-over').forEach(x=>x.classList.remove('drop-over'));tr.classList.add('drop-over')});
@@ -322,8 +323,8 @@ function openOffers(id){let r=cur().rows.find(x=>x.id===id),Z,isCat=false;if(r)Z
  document.body.appendChild(m);const close=()=>m.remove();m.querySelector('.x').onclick=close;m.onclick=e=>{if(e.target===m)close()};
  if(isCat)m.querySelectorAll('.pick2').forEach(b=>b.remove());m.querySelectorAll('.pick2').forEach(b=>b.onclick=()=>{const x=o[+b.dataset.i];if(r.link&&!confirm('Remplacer l\'annonce actuelle de cette ligne par celle-ci ?'))return;Object.assign(r,{link:x.u||r.link,asked:String(x.p),country:x.loc||r.country,seller:x.src==='WatchSalon'?'Boutique':x.pv?'Particulier':'Boutique'});save();close();render()})}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.offbtn');if(b)openOffers(b.dataset.id)});
-function bindRows(){bindDrag();const all=document.getElementById('selAll');if(all){const vis=[...document.querySelectorAll('tbody tr')].map(tr=>cur().rows.find(x=>x.id===tr.dataset.id));all.checked=vis.length>0&&vis.every(r=>r&&r.sel);all.onchange=()=>{vis.forEach(r=>r.sel=all.checked);save();renderSel();renderTable()};}
-document.querySelectorAll('tbody tr').forEach(tr=>{const r=cur().rows.find(x=>x.id===tr.dataset.id);const c=tr.querySelector('.pick');c.onchange=()=>{r.sel=c.checked;save();renderSel();const a=document.getElementById('selAll');if(a)a.checked=[...document.querySelectorAll('.pick')].every(x=>x.checked)}});document.querySelectorAll('tbody tr').forEach(tr=>{const r=cur().rows.find(x=>x.id===tr.dataset.id);
+function bindRows(){bindDrag();const all=document.getElementById('selAll');if(all){const vis=[...document.querySelectorAll('#tablewrap tbody tr')].map(tr=>cur().rows.find(x=>x.id===tr.dataset.id));all.checked=vis.length>0&&vis.every(r=>r&&r.sel);all.onchange=()=>{vis.forEach(r=>r.sel=all.checked);save();renderSel();renderTable()};}
+document.querySelectorAll('#tablewrap tbody tr').forEach(tr=>{const r=cur().rows.find(x=>x.id===tr.dataset.id);const c=tr.querySelector('.pick');c.onchange=()=>{r.sel=c.checked;save();renderSel();const a=document.getElementById('selAll');if(a)a.checked=[...document.querySelectorAll('.pick')].every(x=>x.checked)}});document.querySelectorAll('#tablewrap tbody tr').forEach(tr=>{const r=cur().rows.find(x=>x.id===tr.dataset.id);
   tr.querySelectorAll('[data-f]').forEach(inp=>{const f=inp.dataset.f;const upd=()=>{r[f]=inp.value;save()};inp.addEventListener('input',upd);inp.addEventListener('change',()=>{upd();renderCards();renderTable();renderSide()})});
   tr.querySelector('.del').onclick=()=>{if(confirm('Supprimer cette montre ?')){cur().rows=cur().rows.filter(x=>x.id!==r.id);save();render()}};
   const box=tr.querySelector('.img');
@@ -630,10 +631,9 @@ function openParis(ref){const m=document.createElement('div');m.id='catm';docume
   const allLinks=q?grp.map((g,i)=>`<a class="btn" style="text-decoration:none;display:inline-block" target="_blank" rel="noopener" href="${gq('"'+q+'" ('+g.map(s=>'"'+s[1].replace(/ (Saint-Germain|Champs-Élysées|La Samaritaine|Galeries Lafayette|Printemps Homme|Occasion)$/,'')+'"').join(' OR ')+')')}">Google · boutiques ${i*6+1}-${i*6+g.length}</a>`).join(' ')+` <a class="btn" style="text-decoration:none;display:inline-block" target="_blank" rel="noopener" href="https://www.chrono24.fr/search/index.htm?query=${encodeURIComponent(q)}&dosearch=true">Chrono24</a>`:'<span style="color:#a8a29e">Tapez une référence ou un nom de montre.</span>';
   m.innerHTML=`<div class="box" style="max-width:860px"><button class="mini" id="p_x" style="float:right">Fermer</button><h3>Chercher à Paris</h3>
   <div style="display:flex;gap:8px;margin-bottom:10px"><input id="p_ref" value="${esc(q)}" placeholder="Référence ou nom (ex. 126500LN, Daytona Panda)" style="flex:1;border:1px solid #e7e5e4;border-radius:7px;padding:9px 11px;background:#fff;font-size:15px"><button class="btn primary" id="p_go">Chercher</button></div>
-  <div id="p_auto"></div><div style="font-size:12.5px;color:#78716c;margin-bottom:6px"><b>Recherche manuelle</b> (Google) : toutes les boutiques d’occasion d’un coup.</div>
-  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">${allLinks}</div>
-  <div style="font-size:12.5px;color:#78716c;margin-bottom:6px"><b>Boutique par boutique</b> · « Numéro » ouvre la fiche Google Maps (téléphone, horaires, itinéraire ; sur téléphone : bouton Appeler).</div>
-  ${Object.keys(PCAT).map(c=>`<div style="font-weight:600;font-size:13px;margin:12px 0 6px">${PCAT[c]}</div><table style="width:100%;border-collapse:collapse;font-size:13px">${PARIS.filter(s=>s[0]===c).map(s=>`<tr style="border-top:1px solid #f0efed"><td style="padding:6px 4px"><b>${esc(s[1])}</b><div style="color:#a8a29e;font-size:11.5px">${esc(s[2])}</div></td><td style="padding:6px 4px;white-space:nowrap;text-align:right">${q?`<a class="mini" style="text-decoration:none;color:inherit;display:inline-block" target="_blank" rel="noopener" href="${gq((s[3]?'site:'+s[3]+' ':'"'+s[1].replace(/ (Saint-Germain|Champs-Élysées|La Samaritaine|Galeries Lafayette|Printemps Homme|Occasion)$/,'')+'" ')+q)}">Chercher</a> `:''}<a class="mini" style="text-decoration:none;color:inherit;display:inline-block" target="_blank" rel="noopener" href="${gmap(s[1],s[2])}">Appeler</a></td></tr>`).join('')}</table>`).join('')}</div>`;
+  <div id="p_auto"></div>
+  <div style="font-size:12.5px;color:#78716c;margin:6px 0"><b>Toutes les boutiques de Paris</b> · « Appeler » ouvre la fiche (téléphone, horaires, itinéraire).</div>
+  ${Object.keys(PCAT).map(c=>`<div style="font-weight:600;font-size:13px;margin:12px 0 6px">${PCAT[c]}</div><table style="width:100%;border-collapse:collapse;font-size:13px">${PARIS.filter(s=>s[0]===c).map(s=>`<tr style="border-top:1px solid #f0efed"><td style="padding:6px 4px"><b>${esc(s[1])}</b><div style="color:#a8a29e;font-size:11.5px">${esc(s[2])}</div></td><td style="padding:6px 4px;white-space:nowrap;text-align:right"><a class="mini" style="text-decoration:none;color:inherit;display:inline-block" target="_blank" rel="noopener" href="${gmap(s[1],s[2])}">Appeler</a></td></tr>`).join('')}</table>`).join('')}</div>`;
   m.querySelector('#p_x').onclick=close;runAuto(q,m.querySelector('#p_auto'));const go=()=>{ref=m.querySelector('#p_ref').value;draw()};m.querySelector('#p_go').onclick=go;m.querySelector('#p_ref').onkeydown=e=>{if(e.key==='Enter')go()}};
  draw()}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-paris]');if(!b)return;openParis(b.dataset.paris||'')});
@@ -648,7 +648,11 @@ const AUTO=[
  {n:'Lassaussois Les Montres',d:'https://www.boutiquelesmontres.com',p:'Les Montres Collector Lassaussois'},
  {n:'Laurent Barrier',d:'https://www.laurent-barrier.com',p:'Laurent Barrier Occasion'},
  {n:'Euro Art & Collection',d:'https://euroartcollection.com',p:'Euro Art & Collection'},
- {n:'Montres Mania',d:'https://montresmania.com',p:'Montres Mania',s:['/?post_type=product&s=']}
+ {n:'Montres Mania',d:'https://montresmania.com',p:'Montres Mania',s:['/?post_type=product&s=']},
+ {n:'Dubail',d:'https://www.dubail.com',p:'Dubail Vendôme'},
+ {n:'Arije',d:'https://www.arije.com',p:'Arije Flagship'},
+ {n:'Wempe',d:'https://www.wempe.com',p:'Wempe'},
+ {n:'Bucherer',d:'https://www.bucherer.com',p:'Bucherer Paris'}
 ];
 const hasExt=()=>document.documentElement.dataset.srcExt==='1';
 let _xid=0;const _xw={};window.addEventListener('message',e=>{const m=e.data;if(e.source===window&&m&&m.src==='sourcing-ext'&&_xw[m.id]){_xw[m.id](m.res);delete _xw[m.id]}});
@@ -677,9 +681,9 @@ async function searchShop(s,q){const enc=encodeURIComponent(q);const sk=Object.k
  return{list:[]}}
 async function runAuto(q,box){if(!q.trim()){box.innerHTML='';return}
  if(!hasExt()){box.innerHTML='<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#92400e">Recherche automatique : <b>installez l’extension « Sourcing · Recherche Paris »</b> dans Chrome (PC / Mac), puis rechargez la page.</div>';return}
- const st={},res=[];const draw=()=>{const L=res.slice().sort((a,b)=>(a.na?1:0)-(b.na?1:0)||(a.p||9e9)-(b.p||9e9));
+ const st={},res=[];const draw=()=>{const L=res.slice().sort((a,b)=>(a.na?1:0)-(b.na?1:0)||(a.p||9e9)-(b.p||9e9));window._pL=L;window._pQ=q;
   box.innerHTML=`<div style="font-size:12.5px;color:#78716c;margin-bottom:6px"><b>Résultats automatiques</b> · ${AUTO.map(s=>`<span style="white-space:nowrap">${esc(s.n)} ${st[s.n]===undefined?'⏳':st[s.n].err?'<span style="color:#b45309" title="'+esc(st[s.n].err)+'">⚠</span>':'<b>'+st[s.n].n+'</b>'}</span>`).join(' · ')}</div>
-  ${L.length?`<div style="display:grid;gap:8px;margin-bottom:14px">${L.map(x=>{const sh=PARIS.find(p=>p[1]===x.shop.p);return `<div style="display:flex;gap:10px;align-items:center;border:1px solid #e7e5e4;border-radius:10px;padding:8px;background:#fff">${x.img?`<img src="${esc(x.img)}" style="width:58px;height:58px;object-fit:cover;border-radius:8px;flex:none" referrerpolicy="no-referrer" onerror="this.style.display='none'">`:''}<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${esc(x.t)}${x.na?' <span style="color:#b91c1c;font-size:11px">· Vendue</span>':''}</div><div style="font-size:12px;color:#78716c">${esc(x.shop.n)}${sh?' · '+esc(sh[2]):''}${/full.?set|bo[iî]te|ecrin|écrin|certificat|papiers|box/i.test(x.t+' '+x.u)?' · <b style="color:#15803d">Boîte / papiers</b>':''}</div></div><div style="text-align:right;white-space:nowrap"><div style="font-weight:700">${x.p?eur(x.p):'Prix sur demande'}</div><a class="mini" href="${esc(x.u)}" target="_blank" rel="noopener">Voir l’annonce</a> ${sh?`<a class="mini" href="${gmap(sh[1],sh[2])}" target="_blank" rel="noopener">Appeler</a>`:''}</div></div>`}).join('')}</div>`:(Object.keys(st).length===AUTO.length?'<div style="color:#a8a29e;font-size:13px;margin-bottom:14px">Aucune montre trouvée dans ces boutiques pour cette recherche.</div>':'')}`};
+  ${L.length?`<div style="display:grid;gap:8px;margin-bottom:14px">${L.map((x,ix)=>{const sh=PARIS.find(p=>p[1]===x.shop.p);return `<div style="display:flex;gap:10px;align-items:center;border:1px solid #e7e5e4;border-radius:10px;padding:8px;background:#fff">${x.img?`<img src="${esc(x.img)}" style="width:58px;height:58px;object-fit:cover;border-radius:8px;flex:none" referrerpolicy="no-referrer" onerror="this.style.display='none'">`:''}<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px">${esc(x.t)}${x.na?' <span style="color:#b91c1c;font-size:11px">· Vendue</span>':''}</div><div style="font-size:12px;color:#78716c">${esc(x.shop.n)}${sh?' · '+esc(sh[2]):''}${/full.?set|bo[iî]te|ecrin|écrin|certificat|papiers|box/i.test(x.t+' '+x.u)?' · <b style="color:#15803d">Boîte / papiers</b>':''}</div></div><div style="text-align:right;white-space:nowrap"><div style="font-weight:700">${x.p?eur(x.p):'Prix sur demande'}</div><a class="mini" href="${esc(x.u)}" target="_blank" rel="noopener">Voir l’annonce</a> ${sh?`<a class="mini" href="${gmap(sh[1],sh[2])}" target="_blank" rel="noopener">Appeler</a>`:''}${x.na?'':` <button class="mini" data-padd="${ix}" style="background:#1c1917;color:#fff;border-color:#1c1917">${state.view==='cat'?'+ Catalogue':'+ Dossier'}</button>`}</div></div>`}).join('')}</div>`:(Object.keys(st).length===AUTO.length?'<div style="color:#a8a29e;font-size:13px;margin-bottom:14px">Aucune montre trouvée dans ces boutiques pour cette recherche.</div>':'')}`};
  draw();await Promise.all(AUTO.map(async s=>{try{const r=await searchShop(s,q);if(r.err)st[s.n]={err:r.err};else{st[s.n]={n:r.list.length};r.list.forEach(x=>res.push(Object.assign(x,{shop:s})))}}catch(e){st[s.n]={err:'erreur'}}draw()}))}
 
 // ===== Boutiques de Paris : recherche automatique en arrière-plan (extension requise) =====
@@ -701,6 +705,13 @@ function openParisRes(ref){const c=pGet()[NREF(ref)];if(!c)return;const m=docume
  m.querySelector('#pr_x').onclick=close}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-pres]');if(b){e.stopPropagation();openParisRes(b.dataset.pres)}},true);
 
+
+// ===== Ajouter un résultat « Boutiques Paris » au dossier ou au catalogue =====
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-padd]');if(!b)return;const x=(window._pL||[])[+b.dataset.padd];if(!x)return;
+ const sh=PARIS.find(p=>p[1]===x.shop.p);const loc='France (Paris)'+(sh?' · '+sh[1]:' · '+x.shop.n);const fs=/full.?set|bo[iî]te|ecrin|écrin|certificat|papiers|box/i.test(x.t+' '+x.u)?'Full set':'Non précisé';const ref=(window._pQ||'').trim();const brand=guessBrand(x.t+' '+ref);
+ if(state.view==='cat'){state.catalog=state.catalog||[];state.catalog.push({id:uid(),brand,ref,model:x.t,year:'',price:x.p?String(x.p):'',neg:'',condition:'Occasion',fullset:fs,location:loc,apporteur:x.shop.n,status:'Disponible',notes:'Annonce : '+x.u,img:x.img||'',media:[],added:new Date().toISOString().slice(0,10)});save();renderCatalog();}
+ else{cur().rows.push({id:uid(),zone,brand,img:x.img||'',model:x.t,ref,country:loc,link:x.u,asked:x.p?String(x.p):'',negotiated:'',market:'',sale:'',freight:'',condition:'Occasion',fullset:fs,polish:'Non précisé',recheck:'Non',service:'',status:'À contacter',notes:'',seller:'Boutique'});save();render();}
+ b.textContent='Ajoutée ✓';b.disabled=true;b.style.background='#15803d';b.style.borderColor='#15803d'});
 </script>
 </body>
 </html>
