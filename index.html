@@ -270,7 +270,7 @@ function renderTable(){
   if(!d.rows.length){wrap.innerHTML='<div class="empty">Aucune montre pour l\'instant.</div>';return}
   const act=rows.filter(r=>r.status!=='Écartée');const sum=f=>eur(act.reduce((s,r)=>s+f(r),0));
   wrap.innerHTML=`<table><thead><tr>
-  <th><input type="checkbox" id="selAll" title="Tout sélectionner"></th><th></th><th>Maison</th><th>Référence</th><th>Vendeur</th><th>Pays</th><th>Année</th><th>Annonce</th>
+  <th><input type="checkbox" id="selAll" title="Tout sélectionner"></th><th></th><th>Maison</th><th>Référence</th><th>Vendeur</th><th>Pays</th><th>Année</th><th>Taille</th><th>Annonce</th>
   <th class="r">Demandé</th><th>Full set</th><th class="r">Marché</th><th>Cote marché</th><th class="r">Vente client</th><th class="r">Frais</th><th class="r">Coût total</th><th class="r">Marge</th><th>État</th><th>Polissage</th><th>Révision</th><th>Statut</th><th>À re-chercher</th><th>Commentaire client</th><th></th><th></th></tr></thead><tbody>
   ${rows.map(r=>{const m=marge(r);const si=STATUTS.indexOf(r.status)+1;return `<tr data-id="${r.id}">
     <td><input type="checkbox" class="pick" ${r.sel?'checked':''}></td>
@@ -280,6 +280,7 @@ function renderTable(){
     <td>${sel('seller',r.seller||'Non précisé',OPTS.seller)}</td>
     <td><input data-f="country" class="w-country" value="${esc(r.country)}" placeholder="Pays"></td>
     <td><input data-f="year" class="num" style="width:70px;text-align:left" inputmode="numeric" value="${esc(r.year||'')}" placeholder="—"></td>
+    <td><input data-f="size" class="num" style="width:70px;text-align:left" value="${esc(r.size||'')}" placeholder="— mm"></td>
     <td class="link">${r.link?`<a href="${esc(r.link)}" target="_blank" rel="noopener">Voir l'annonce</a>`:''}<input data-f="link" value="${esc(r.link)}" placeholder="Coller le lien"></td>
     <td><input data-f="asked" class="num" inputmode="decimal" value="${esc(r.asked)}" placeholder="—"></td>
     <td>${sel('fullset',r.fullset,OPTS.fullset)}</td>
@@ -295,7 +296,7 @@ function renderTable(){
     <td>${sel('recheck',r.recheck||'Non',OPTS.recheck,'w-sel '+((r.recheck||'Non')==='À re-chercher'?'np':''))}</td>
     <td><input data-f="ccomment" class="w-notes" value="${esc(r.ccomment||'')}" placeholder="Visible par le client"></td>
     <td style="white-space:nowrap"><button class="dup" data-dup="${r.id}" title="Dupliquer cette montre">⧉</button><button class="del" title="Supprimer">×</button></td><td><span class="grip" draggable="true" title="Glisser pour déplacer">⋮⋮</span></td></tr>`}).join('')}
-  </tbody><tfoot><tr><td colspan="8">Total</td><td class="money">${sum(r=>num(r.asked))}</td><td></td><td class="money">${sum(r=>num(r.market))}</td><td></td><td class="money">${sum(sale)}</td><td class="money">${sum(r=>num(r.freight))}</td><td class="money">${sum(r=>cost(r)+num(r.freight))}</td><td class="marge pos">${sum(marge)}</td><td colspan="8"></td></tr></tfoot></table>`;
+  </tbody><tfoot><tr><td colspan="9">Total</td><td class="money">${sum(r=>num(r.asked))}</td><td></td><td class="money">${sum(r=>num(r.market))}</td><td></td><td class="money">${sum(sale)}</td><td class="money">${sum(r=>num(r.freight))}</td><td class="money">${sum(r=>cost(r)+num(r.freight))}</td><td class="marge pos">${sum(marge)}</td><td colspan="8"></td></tr></tfoot></table>`;
   bindRows();
 }
 let dragId=null;
@@ -540,20 +541,20 @@ function bigCards(rows){const n=rows.length,T=Math.min(Math.floor(900/n),300),im
  <div class="kv"><div><span>Année</span>${esc(r.year||'—')}</div><div><span>État</span>${esc(r.condition==='Non précisé'?'—':r.condition)}</div><div><span>Ensemble</span>${esc(r.fullset==='Non précisé'?'—':r.fullset)}</div></div>
  <div class="lb">${has?`<div class="lchart" style="width:${cw}px"><div class="cl">Cote du marché</div><img src="${curveImg(r,cw,ch,true)}" width="${cw}" height="${ch}"></div>`:''}${r.ccomment?`<div class="lcom"><div class="cl">Commentaires</div>${esc(r.ccomment)}</div>`:''}</div></div></div>`}).join('')}
 document.getElementById('pdfClient').onclick=()=>{const rows=exportRows();if(!rows.length){alert('Aucune montre à exporter.');return}
- const O=[['photo','Photo',1],['prix','Prix proposé',1],['ecart','Écart avec le marché (%)',1],['annee','Année',1],['etat','État',1],['ensemble','Boîte / papiers',1],['cote','Courbe de la cote du marché',1],['commentaire','Commentaires client',1],['pays','Provenance (pays)',0],['vendeur','Type de vendeur',0],['polissage','Polissage',0],['revision','Révision',0],['fiche','Fiche technique (Info)',0],['statut','Statut',0],['marche','Prix du marché (valeur)',0],['achat','Prix demandé par le vendeur',0],['frais','Frais',0],['marge','Marge',0],['lien','Lien de l’annonce',0]];
+ const O=[['photo','Photo',1],['prix','Prix proposé',1],['ecart','Écart avec le marché (%)',1],['annee','Année',1],['taille','Taille (mm)',1],['etat','État',1],['ensemble','Boîte / papiers',1],['cote','Courbe de la cote du marché',1],['commentaire','Commentaires client',1],['pays','Provenance (pays)',0],['vendeur','Type de vendeur',0],['polissage','Polissage',0],['revision','Révision',0],['fiche','Fiche technique (Info)',0],['statut','Statut',0],['marche','Prix du marché (valeur)',0],['achat','Prix demandé par le vendeur',0],['frais','Frais',0],['marge','Marge',0],['lien','Lien de l’annonce',0]];
  let saved={};try{saved=JSON.parse(localStorage.getItem('srcPdfOpts')||'{}')}catch(e){}
  const m=document.createElement('div');m.id='catm';document.body.appendChild(m);const close=()=>m.remove();m.onclick=e=>{if(e.target===m)close()};
  const box=(o)=>`<label style="display:flex;gap:8px;align-items:center;padding:6px 8px;border:1px solid #e7e5e4;border-radius:8px;cursor:pointer;font-size:13px;color:#1c1917"><input type="checkbox" data-po="${o[0]}" ${(saved[o[0]]??o[2])?'checked':''} style="width:auto;accent-color:#1c1917">${o[1]}</label>`;
  m.innerHTML=`<div class="box" style="max-width:600px"><button class="mini" id="po_x" style="float:right">Fermer</button><h3>PDF client · ${rows.length} montre${rows.length>1?'s':''}</h3><div style="color:#78716c;font-size:12.5px;margin:-6px 0 12px">Cochez ce qui apparaît sur le PDF. Format téléphone, une montre par page : la mise en page s’adapte au nombre d’infos.</div>
- <div style="font-weight:600;font-size:12.5px;margin:6px 0">Pour le client</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${O.slice(0,8).map(box).join('')}</div>
- <div style="font-weight:600;font-size:12.5px;margin:14px 0 6px">Détails en plus <span style="font-weight:400;color:#b45309">(attention : marge, prix vendeur et frais sont des infos internes)</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${O.slice(8).map(box).join('')}</div>
+ <div style="font-weight:600;font-size:12.5px;margin:6px 0">Pour le client</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${O.slice(0,9).map(box).join('')}</div>
+ <div style="font-weight:600;font-size:12.5px;margin:14px 0 6px">Détails en plus <span style="font-weight:400;color:#b45309">(attention : marge, prix vendeur et frais sont des infos internes)</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${O.slice(9).map(box).join('')}</div>
  <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><button class="btn" id="po_c">Annuler</button><button class="btn primary" id="po_go">Créer le PDF</button></div></div>`;
  m.querySelector('#po_x').onclick=close;m.querySelector('#po_c').onclick=close;
  m.querySelector('#po_go').onclick=()=>{const o={};m.querySelectorAll('[data-po]').forEach(c=>o[c.dataset.po]=c.checked);try{localStorage.setItem('srcPdfOpts',JSON.stringify(o))}catch(e){}close();pdfClientMake(rows,o)}};
 function pdfClientMake(rows,o){const d=new Date().toLocaleDateString('fr-FR');const Z=zone==='Europe'?'Europe':'International';const NP=v=>!v||v==='Non précisé'?'—':v;
  const IL={mouvement:'Mouvement',calibre:'Calibre',diametre:'Diamètre',matiere:'Boîtier',cadran:'Cadran',bracelet:'Bracelet',lunette:'Lunette',etancheite:'Étanchéité',reserve:'Réserve de marche'};
  const body=rows.map((r,i)=>{const hasC=coteOf(r);const kv=[];
-  if(o.annee)kv.push(['Année',r.year||'—']);if(o.etat)kv.push(['État',NP(r.condition)]);if(o.ensemble)kv.push(['Ensemble',NP(r.fullset)]);if(o.pays)kv.push(['Provenance',r.country||'—']);if(o.vendeur)kv.push(['Vendeur',NP(r.seller)]);if(o.polissage)kv.push(['Polissage',NP(r.polish)]);if(o.revision)kv.push(['Révision',r.service||'—']);if(o.statut)kv.push(['Statut',r.status||'—']);
+  if(o.annee)kv.push(['Année',r.year||'—']);if(o.taille){const tz=r.size||((typeof refInfo==='function'&&refInfo(r.ref))||{}).diametre||(r.info||{}).diametre||'';if(tz)kv.push(['Taille',tz])}if(o.etat)kv.push(['État',NP(r.condition)]);if(o.ensemble)kv.push(['Ensemble',NP(r.fullset)]);if(o.pays)kv.push(['Provenance',r.country||'—']);if(o.vendeur)kv.push(['Vendeur',NP(r.seller)]);if(o.polissage)kv.push(['Polissage',NP(r.polish)]);if(o.revision)kv.push(['Révision',r.service||'—']);if(o.statut)kv.push(['Statut',r.status||'—']);
   if(o.marche&&hasC)kv.push(['Prix du marché',eur(hasC)]);if(o.achat&&has(r.asked))kv.push(['Prix vendeur',eur(num(r.asked))]);if(o.frais)kv.push(['Frais',eur(num(r.freight))]);if(o.marge)kv.push(['Marge',eur(marge(r))]);
   const inf=Object.assign({},(typeof refInfo==='function'&&refInfo(r.ref))||{},r.info||{});const fk=o.fiche?Object.keys(IL).filter(k=>inf[k]):[];
   const showC=o.cote&&hasC,com=o.commentaire&&r.ccomment;
@@ -779,7 +780,7 @@ function parseListing(html,url){const d=new DOMParser().parseFromString(html,'te
  const et=g('état','condition');r.cond=/non porté|neuf|unworn|new/i.test(et)?'Neuve':/très bon|excellent|comme neuf|very good|like new/i.test(et)?'Occasion (très bon)':et?'Occasion':'';
  const ct=(g('contenu livré','scope of delivery','contenu','boîte et papiers','box and papers')+' '+title+' '+desc).toLowerCase().replace('ensemble complet','full set');const box=/coffret|bo[iî]te|box|écrin|ecrin/.test(ct)&&!/sans (coffret|bo[iî]te)|no box|without box/.test(ct),pap=/papiers|papers|certificat|garantie|warranty card/.test(ct)&&!/sans papiers|no papers|without papers/.test(ct);r.fullset=/full.?set/.test(ct)?'Full set':box&&pap?'Full set':pap?'Montre + papiers':box?'Montre + boîte':(g('contenu livré','scope of delivery','boîte et papiers')||/montre seule|watch only/.test(ct))?'Montre seule':'';
  const all=(title+' '+desc+' '+body).toLowerCase();r.polish=/jamais poli|non poli|unpolish|never polish|not polished|pas poli/.test(all)?'Jamais polie':/l[ée]g[eè]rement poli|polissage l[ée]ger|light(ly)? polish/.test(all)?'Polissage léger':/\bpolie?\b|\bpolished\b|polissage/.test(all)?'Polie':'';
- const loc=g('emplacement','location','localisation');r.country=loc?loc.split(',')[0].trim()+(/paris/i.test(loc)?' (Paris)':''):'';
+ const dz=g('diamètre','diameter','case size','taille du boîtier','taille');const dm=(dz.match(/(\d{2}(?:[.,]\d{1,2})?)\s?(?:x\s?\d{2}(?:[.,]\d)?\s?)?mm/i)||(title+' '+desc).match(/\b(\d{2}(?:[.,]\d{1,2})?)\s?mm\b/i)||[]);r.size=dm[1]?dm[1].replace('.',',')+' mm':'';const loc=g('emplacement','location','localisation');r.country=loc?loc.split(',')[0].trim()+(/paris/i.test(loc)?' (Paris)':''):'';
  if(/watchsalon\./.test(url)){r.seller='Boutique';const m=desc.match(/propos[ée]e par .+? à ([^.]+?)\./i);if(m&&!r.country){const parts=m[1].split(',').map(s=>s.trim());r.country=parts[parts.length-1]+(/paris/i.test(m[1])?' (Paris)':'')}}else if(/chrono24\./.test(url))r.seller=/vendeur particulier|private seller/i.test(body)?'Particulier':'Boutique';else{try{const host=new URL(url).host.replace(/^www\./,'');const shop=AUTO.find(s=>s.d&&s.d.includes(host));if(shop){r.country=r.country||'France (Paris)';r.seller='Boutique'}if(/leboncoin|vinted|ebay|2ememain|marktplaats/.test(host))r.seller='Particulier'}catch(_){}}
  if(!r.ref){const m=(title+' '+desc).match(/\br[ée]f(?:[ée]rence)?\.?\s*:?\s*([A-Z0-9][A-Z0-9.\-\/]{2,})/i);if(m)r.ref=m[1].toUpperCase()}r.img=meta('og:image')||o.img||'';if(!r.brand)r.brand=guessBrand(title);if(!r.model&&title)r.model=title.replace(new RegExp('^'+(r.brand||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i'),'').trim().slice(0,90);
  return r}
@@ -787,9 +788,9 @@ async function autoFillLink(id,url){if(!/^https?:\/\/([a-z0-9-]+\.)*(chrono24\.[
  if(document.documentElement.dataset.srcExt!=='1'){toast('Lien enregistré. Pour remplir la ligne automatiquement, installez l’extension (PC / Mac).',4500);return}
  toast('Lecture de l’annonce…');const res=await extFetch(url.replace('://www.chrono24.com/','://www.chrono24.fr/'));if(!res.text){toast('Impossible de lire cette annonce ('+(res.status||res.error||'erreur')+').',4500);return}
  const r=parseListing(res.text,res.url||url);const set=(k,v)=>{if(v)row[k]=String(v)};const before=JSON.stringify(row);
- set('brand',r.brand);set('model',r.model);set('ref',r.ref);set('year',r.year);if(r.price)row.asked=String(r.price);set('country',r.country);set('seller',r.seller);set('condition',r.cond);set('fullset',r.fullset);set('polish',r.polish);if(r.img&&!/^data:/.test(row.img||''))row.img=r.img;
+ set('brand',r.brand);set('model',r.model);set('ref',r.ref);set('year',r.year);if(r.price)row.asked=String(r.price);set('country',r.country);set('seller',r.seller);set('condition',r.cond);set('fullset',r.fullset);set('polish',r.polish);set('size',r.size);if(r.img&&!/^data:/.test(row.img||''))row.img=r.img;
  const n=['brand','model','ref','year','asked','country','seller','condition','fullset','polish'].filter(k=>row[k]&&row[k]!=='Non précisé').length;save();render();
- toast(JSON.stringify(row)!==before?'Annonce lue : '+[r.brand,r.ref,r.year,r.price?eur(r.price):''].filter(Boolean).join(' · ')+(r.polish?' · '+r.polish:''):'Annonce lue, mais aucune info trouvée.',5000)}
+ toast(JSON.stringify(row)!==before?'Annonce lue : '+[r.brand,r.ref,r.year,r.size,r.price?eur(r.price):''].filter(Boolean).join(' · ')+(r.polish?' · '+r.polish:''):'Annonce lue, mais aucune info trouvée.',5000)}
 document.addEventListener('change',e=>{const i=e.target;if(!i||!i.matches||!i.matches('input[data-f="link"]'))return;const tr=i.closest('tr[data-id]');if(!tr)return;const id=tr.dataset.id,u=i.value.trim();setTimeout(()=>autoFillLink(id,u),50)},true);
 </script>
 </body>
