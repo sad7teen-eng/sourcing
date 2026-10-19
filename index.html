@@ -511,8 +511,8 @@ const PDFCSS=`.pdfdoc{font:11px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans
 .pdfdoc .foot{margin-top:18px;color:#a8a29e;font-size:10px}`;
 let _h2p;function loadH2P(){return _h2p||(_h2p=new Promise((ok,ko)=>{if(window.html2pdf)return ok();const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';s.onload=ok;s.onerror=()=>{_h2p=null;ko()};document.head.appendChild(s)}))}
 const blobToData=b=>new Promise(ok=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.onerror=()=>ok(null);fr.readAsDataURL(b)});
-function fitSquare(d){return new Promise(ok=>{const im=new Image();im.onload=()=>{const S=400,c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');x.fillStyle='#f5f5f4';x.fillRect(0,0,S,S);const p=S*0.08,k=Math.min((S-2*p)/im.width,(S-2*p)/im.height),w=im.width*k,hh=im.height*k;x.drawImage(im,(S-w)/2,(S-hh)/2,w,hh);ok(c.toDataURL('image/jpeg',0.92))};im.onerror=()=>ok(null);im.src=d})}
-async function imgData(src){const d=await rawImg(src);return d?fitSquare(d):null}
+function fitSquare(d,crop=0){return new Promise(ok=>{const im=new Image();im.onload=()=>{const S=400,c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d');x.fillStyle='#f5f5f4';x.fillRect(0,0,S,S);const sy=Math.round(im.height*crop),sh=im.height-sy;const p=S*0.08,k=Math.min((S-2*p)/im.width,(S-2*p)/sh),w=im.width*k,hh=sh*k;x.drawImage(im,0,sy,im.width,sh,(S-w)/2,(S-hh)/2,w,hh);ok(c.toDataURL('image/jpeg',0.92))};im.onerror=()=>ok(null);im.src=d})}
+async function imgData(src){const d=await rawImg(src);return d?fitSquare(d,/leboncoin\./i.test(String(src))?0.07:0):null}
 async function rawImg(src){if(!src||src.startsWith('data:'))return src||null;
  for(const u of [src,'https://images.weserv.nl/?url='+encodeURIComponent(src.replace(/^https?:\/\//,''))]){try{const r=await fetch(u,{mode:'cors'});if(r.ok){const b=await r.blob();if(b.type.startsWith('image/')){const d=await blobToData(b);if(d)return d}}}catch(_){}}
  return null}
