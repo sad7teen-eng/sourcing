@@ -519,13 +519,13 @@ async function rawImg(src){if(!src||src.startsWith('data:'))return src||null;
 const safeName=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w-]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
 async function makePdf(filename,body,landscape,btn,phone){const lbl=btn.textContent;btn.disabled=true;btn.textContent='Création du PDF…';
  const box=document.createElement('div');box.style.cssText=`position:fixed;left:-10000px;top:0;width:${phone?430:landscape?1040:710}px;background:#fff`;
- box.innerHTML=`<style>${PDFCSS}</style><div class="pdfdoc">${body}</div>`;document.body.appendChild(box);
+ box.innerHTML=`<style>${PDFCSS}</style><div class="pdfdoc" style="${phone?'padding:0 16px 0 4px;box-sizing:border-box;width:430px':''}">${body}</div>`;document.body.appendChild(box);
  try{await loadH2P();
   await Promise.all([...box.querySelectorAll('img[data-src]')].map(async im=>{const d=await imgData(im.dataset.src);if(d)im.src=d;else{const p=document.createElement('div');p.className=im.dataset.ph;im.replaceWith(p)}}));
   if(phone){const LIM=785;box.querySelectorAll('.pcard').forEach(c=>{const pi=c.querySelector('.pimg'),ch=c.querySelector('img.pchart');const H=()=>c.offsetHeight;let g=0;
    while(H()>LIM&&g++<40){const cur=pi?parseInt(getComputedStyle(pi).getPropertyValue('--pim'))||250:0;const chh=ch?parseInt(ch.style.height||ch.getAttribute('height'))||165:0;
     if(pi&&cur>150)pi.style.setProperty('--pim',(cur-15)+'px');else if(ch&&chh>95)ch.style.height=(chh-12)+'px';else if(!c.classList.contains('tight'))c.classList.add('tight');else if(!c.classList.contains('tight2'))c.classList.add('tight2');else if(pi&&cur>110)pi.style.setProperty('--pim',(cur-10)+'px');else break}})}
-  await html2pdf().set({margin:phone?[6,6,6,6]:[12,12,12,12],filename,image:{type:'jpeg',quality:0.95},enableLinks:true,html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:phone?[126,224]:'a4',orientation:landscape?'landscape':'portrait'},pagebreak:phone?{mode:['css'],before:'.pnext'}:{mode:['css','legacy'],avoid:['tr','.card','.lcard','.stats','.qcard']}}).from(box.querySelector('.pdfdoc')).save();
+  await html2pdf().set({margin:phone?[6,6,6,6]:[12,12,12,12],filename,image:{type:'jpeg',quality:0.95},enableLinks:true,html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0},jsPDF:{unit:'mm',format:phone?[126,224]:'a4',orientation:landscape?'landscape':'portrait'},pagebreak:phone?{mode:['css'],before:'.pnext'}:{mode:['css','legacy'],avoid:['tr','.card','.lcard','.stats','.qcard']}}).from(box.querySelector('.pdfdoc')).save();
  }catch(e){console.error(e);alert("Impossible de créer le PDF (connexion internet nécessaire).")}
  finally{box.remove();btn.disabled=false;btn.textContent=lbl}}
 const pdfImg=(src,ph)=>src?`<img data-src="${esc(src)}" data-ph="${ph}">`:`<div class="${ph}"></div>`;
