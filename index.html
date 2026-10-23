@@ -404,7 +404,7 @@ function mkt(r){const m={};const add=(ym,a,lo,hi,src)=>{(m[ym]=m[ym]||[]).push([
  const Z=zoneOf(r);(r.wsHist||[]).filter(h=>(h.z||'International')===Z).forEach(h=>add(h.at.slice(0,10),h.avg,h.min,h.max,'w'));(r.c24Hist||[]).filter(h=>h.z&&h.z===Z&&h.q).forEach(h=>add(h.at.slice(0,10),h.avg,h.min,h.max,'c'));
  const ks=Object.keys(m).sort();if(!ks.length)return null;
  const pts=ks.map(k=>{const v=m[k];return[k,Math.round(v.reduce((s,x)=>s+x[0],0)/v.length),Math.min(...v.map(x=>x[1])),Math.max(...v.map(x=>x[2]))]}).slice(-24);
- const lastM=m[ks[ks.length-1]];return{pts,last:pts[pts.length-1][1],src:[...new Set(lastM.map(x=>x[3]))],n:r.ws&&r.ws.n||0}}
+ const lastM=m[ks[ks.length-1]];const lk=ks[ks.length-1];const pool=[].concat(r.c24&&String(r.c24.at||'').slice(0,10)===lk&&lastM.some(x=>x[3]==='c')?(r.c24.prices||[]):[],r.ws&&String(r.ws.at||'').slice(0,10)===lk&&lastM.some(x=>x[3]==='w')?(r.ws.prices||[]):[]);if(pool.length){const S=snapOf(pool);if(S){const p=pts[pts.length-1];p[1]=S.avg;p[2]=S.min;p[3]=S.max}}return{pts,last:pts[pts.length-1][1],src:[...new Set(lastM.map(x=>x[3]))],n:r.ws&&r.ws.n||0}}
 function curveImg(r,w,hh,big){const M=mkt(r);if(!M)return '';const s=sale(r);const key=['v2',r.id,JSON.stringify(M.pts.slice(-3)),M.pts.length,s,w,hh,big].join('|');if(_cimg[key])return _cimg[key];
  let pts=M.pts.slice(-12);if(pts.length<2)pts=[pts[0],pts[0]];const k=2,cv=document.createElement('canvas');cv.width=w*k;cv.height=hh*k;const x=cv.getContext('2d');x.scale(k,k);
  const fz=big&&w>=400?1.4:1;const kf=v=>Math.round(v/1000)+' k€';const L=big?4:2,Rr=big?40*fz:2,T=big?16*fz:3,B=big?13*fz:3;
