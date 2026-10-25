@@ -47,11 +47,29 @@ button.primary:hover{background:#333}
 .chip:hover{color:var(--text)}
 .chip.on{background:var(--white);color:var(--text);box-shadow:0 0 0 1px var(--line);font-weight:500}
 .tablewrap{overflow-x:auto;overflow-y:visible;border:1px solid var(--line);border-radius:10px;background:var(--white)}
-.tcompact{width:100%;min-width:0;font-size:12.5px}.tcompact th{padding:8px 4px;font-size:11.5px;position:static}.tcompact td{padding:4px 3px}.tcompact input,.tcompact select{padding:3px 4px}
-.tcompact .img{width:46px;height:46px;font-size:14px}.tcompact td.w-model{min-width:150px;width:150px}.tcompact .infobtn{white-space:nowrap}.tcompact .tbrand{font-size:11.5px;color:var(--muted);padding-bottom:0}.tcompact input.refmain{font-size:13px}.tcompact input.ref{font-size:11.5px}
-.tcompact .w-sel{width:82px;font-size:12px}.tcompact .w-country{width:70px}.tcompact input.num{width:66px}.tcompact input.num.tiny{width:44px}.tcompact td.link{max-width:88px}.tcompact td.link input{width:84px;font-size:11.5px}
-.tcompact td.cote{min-width:0;width:104px;max-width:110px;font-size:11px;color:var(--muted)}.tcompact .cote div{white-space:normal}.tcompact td.cote input.mk{width:96px;font-size:12.5px;color:var(--text)}.tcompact .cacts{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}.tcompact .cbtn{font:inherit;font-size:11px;border:1px solid #d6d3d1;background:#fff;border-radius:6px;padding:1px 6px;cursor:pointer;white-space:nowrap}.tcompact .offbtn{font-size:11px;padding:1px 6px;white-space:normal;text-align:left}.tcompact td.acts{width:40px;text-align:center}.tcompact td.acts>*{display:block;margin:0 auto}
-.tcompact .marge,.tcompact .money{white-space:nowrap}.tcompact .dup,.tcompact .del{padding:2px 4px}
+.tcompact{table-layout:fixed;min-width:0;font-size:13px;border-collapse:separate}
+.tcompact th{position:relative;padding:9px 8px;font-size:12px;text-align:left!important;overflow:visible;white-space:nowrap}
+.tcompact th .rz{position:absolute;top:0;right:-4px;width:9px;height:100%;cursor:col-resize;z-index:3}
+.tcompact th .rz::after{content:'';position:absolute;left:4px;top:22%;bottom:22%;width:1px;background:#ebe9e6}
+.tcompact th .rz:hover::after,.tcompact th .rz.on::after{background:#1c1917;width:2px;top:0;bottom:0}
+.tcompact td{padding:6px 6px;overflow:hidden;border-right:1px solid #f6f5f3;text-align:left}
+.tcompact td:last-child,.tcompact tr.grp td{border-right:0}
+.tcompact input,.tcompact select{padding:3px 4px;width:100%;max-width:100%;box-sizing:border-box;text-align:left!important}
+.tcompact .img{width:64px;height:64px;font-size:16px}
+.tcompact .tbrand{font-size:12px;color:var(--muted);padding-bottom:0}.tcompact input.refmain{font-size:14px}.tcompact input.ref{font-size:12px}.tcompact .infobtn{white-space:nowrap}
+.tcompact .w-sel{font-size:13px}
+.tcompact td.link a{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tcompact td.link input{font-size:11.5px}
+.tcompact td.cote{min-width:0;color:var(--muted);font-size:11.5px}
+.tcompact .cbig{font-size:18px;font-weight:700;color:var(--text);line-height:1.2;letter-spacing:-.01em}.tcompact .cvs{font-size:11.5px;margin:1px 0 4px}.tcompact .cote img{max-width:100%;height:auto;display:block}.tcompact .cnone{font-size:12px;color:#a8a29e;margin-bottom:2px}
+.tcompact .cmk{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);margin-top:4px}.tcompact .cmk input{font-size:12px;padding:1px 4px;width:auto;flex:1;min-width:0}
+.tcompact .cote div{white-space:normal}.tcompact .cacts{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.tcompact .cbtn{font:inherit;font-size:11.5px;border:1px solid #d6d3d1;background:#fff;border-radius:6px;padding:2px 7px;cursor:pointer;white-space:nowrap}.tcompact .offbtn{font-size:11.5px;padding:2px 7px;white-space:normal;text-align:left;margin-top:0}
+.tcompact td[class^="c-"] input,.tcompact td.c-green input,.tcompact td.c-yellow input,.tcompact td.c-red input{font-size:15px;font-weight:700;padding:6px 8px;border-radius:7px}
+.tcompact td input[data-f="sale"]{font-size:15px;font-weight:700;padding:6px 8px;border:1px solid #e7e5e4;border-radius:7px;background:#fff}
+.tcompact .marge{font-size:15px;text-align:left!important;white-space:nowrap}.tcompact .money{white-space:nowrap}
+.tcompact input[data-f="asked"]{font-size:14px;font-weight:600}
+.tcompact td.acts{text-align:center;padding:4px 2px}.tcompact td.acts>*{display:block;margin:0 auto}.tcompact .dup,.tcompact .del{padding:2px 4px}
+.tcompact tfoot td{text-align:left;border-right:0}
 .colpick{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--muted)}.colpick label{display:flex;gap:4px;align-items:center;cursor:pointer;color:var(--text)}.colpick input{width:auto;margin:0}.filters .grpadd{margin-left:12px}
 aside{position:sticky;top:0;height:100vh;align-self:start;z-index:6;box-sizing:border-box;overflow-y:auto}
 tr.grp td{background:#f5f5f4!important;border-top:2px solid #1c1917;padding:9px 10px}tr.grp .gname{font-weight:700;font-size:14px;width:auto;min-width:240px;background:#fff;border:1px solid #e7e5e4}tr.grp .gcnt{color:#78716c;font-size:12px;margin:0 10px}tr.grp button{font:inherit;font-size:12px;border:1px solid #d6d3d1;background:#fff;border-radius:6px;padding:3px 8px;cursor:pointer;margin-left:4px}tr.grp.drop-over td{background:#fef3c7!important}.grpadd{margin-left:auto;font:inherit;font-size:12.5px;border:1px dashed #a8a29e;background:none;border-radius:6px;padding:5px 10px;cursor:pointer;color:#57534e}.grpadd:hover{background:#fff;color:#1c1917}#selbar select{width:auto;background:#fff;color:#1c1917;border-radius:6px;padding:4px 6px}
@@ -120,7 +138,7 @@ main{padding:14px 14px 40px}
 .filters{overflow-x:auto;flex-wrap:nowrap}
 .chip{padding:8px 12px;font-size:14px;white-space:nowrap}
 .hint{display:none}
-.tablewrap{max-height:none;overflow:visible;border:0;background:none;border-radius:0}aside{height:auto;overflow-y:visible}.tablewrap{overflow:visible}.colpick{margin-left:0;flex-wrap:wrap}tr.grp{display:block!important;padding:0!important;border:0!important;background:none!important}tr.grp td{display:block;border-radius:10px}tr.grp .gname{min-width:0;width:100%;margin-bottom:6px}tr.grp td>span:last-child{display:none}
+.tablewrap{max-height:none;overflow:visible;border:0;background:none;border-radius:0}aside{height:auto;overflow-y:visible}.tablewrap{overflow:visible}.filters{flex-wrap:wrap}.colpick{display:none!important}.tablewrap table.tcompact{width:100%!important;table-layout:auto}.tablewrap colgroup{display:none}.tcompact td{border-right:0;overflow:visible}.colpick{margin-left:0;flex-wrap:wrap}tr.grp{display:block!important;padding:0!important;border:0!important;background:none!important}tr.grp td{display:block;border-radius:10px}tr.grp .gname{min-width:0;width:100%;margin-bottom:6px}tr.grp td>span:last-child{display:none}
 .tablewrap table,.tablewrap tbody,.tablewrap tfoot,#catview table,#catview tbody{display:block;width:100%;min-width:0}
 .tablewrap thead,#catview thead{display:none}
 .tablewrap tbody tr,#catview tbody tr{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;position:relative}
@@ -320,9 +338,8 @@ function renderTable(){
   const act=rows.filter(r=>r.status!=='Écartée');const sum=f=>eur(act.reduce((s,r)=>s+f(r),0));
   const OC=tblCols();const ex=[['polish','Polissage'],['ship','Livraison'],['status','Statut']].filter(k=>OC[k[0]]);const NC=15+ex.length;
   const cbtn=(id,t)=>`<button data-acote="${id}" title="Cherche la cote du marché" class="cbtn">${t}</button>`;
-  wrap.innerHTML=`<table class="tcompact"><thead><tr>
-  <th><input type="checkbox" id="selAll" title="Tout sélectionner"></th><th></th><th>Montre</th><th>Vendeur</th><th>Pays</th><th>Année</th><th>Taille</th><th>Annonce</th>
-  <th class="r">Demandé</th><th>Full set</th><th>État</th><th>Cote marché</th><th class="r">Vente client</th><th class="r">Marge</th>${ex.map(k=>`<th>${k[1]}</th>`).join('')}<th></th></tr></thead><tbody>
+  const CK=[['sel',''],['img',''],['montre','Montre'],['vendeur','Vendeur'],['pays','Pays'],['annee','Année'],['taille','Taille'],['annonce','Annonce'],['demande','Demandé'],['fullset','Full set'],['etat','État'],['cote','Cote marché'],['vente','Vente client'],['marge','Marge'],...ex,['acts','']];const CW=colWidths(CK.map(k=>k[0]));
+  wrap.innerHTML=`<table class="tcompact" style="width:${CK.reduce((a,k)=>a+CW[k[0]],0)}px"><colgroup>${CK.map(k=>`<col data-ck="${k[0]}" style="width:${CW[k[0]]}px">`).join('')}</colgroup><thead><tr>${CK.map(k=>`<th>${k[0]==='sel'?'<input type="checkbox" id="selAll" title="Tout sélectionner">':k[1]}${k[0]!=='acts'?`<span class="rz" data-rz="${k[0]}" title="Glisser pour élargir ou rétrécir la colonne"></span>`:''}</th>`).join('')}</tr></thead><tbody>
   ${(()=>{const G=(d.groups=d.groups||[]);const ids=new Set(G.map(g=>g.id));const rowHtml=r=>{const m=marge(r);const si=STATUTS.indexOf(r.status)+1;const o=(r.offers||{})[zoneOf(r)]||[];return `<tr data-id="${r.id}">
     <td><input type="checkbox" class="pick" ${r.sel?'checked':''}></td>
     <td><div class="img" tabindex="0" title="Cliquez puis collez une image">${r.img?`<img src="${r.img}" alt="">`:'+'}</div></td>
@@ -335,7 +352,7 @@ function renderTable(){
     <td><input data-f="asked" class="num" inputmode="decimal" value="${esc(r.asked)}" placeholder="—"></td>
     <td>${sel('fullset',r.fullset,OPTS.fullset)}</td>
     <td>${sel('condition',r.condition,OPTS.condition)}</td>
-    <td class="cote"><input data-f="market" class="num mk" inputmode="decimal" value="${esc(r.market)}" placeholder="Prix marché" title="Prix du marché">${coteOf(r)?`<img src="${curveImg(r,96,26)}" width="96" height="28" alt=""><div>${eur(coteOf(r))} · ${vsCote(r)}</div>`:''}<div class="cacts">${cbtn(r.id,coteOf(r)?'Actualiser':'Cote auto')}${o.length?`<button class="offbtn" data-id="${r.id}">${o.length} offres · dès ${eur(o[0].p)}</button>`:''}</div></td>
+    <td class="cote">${coteOf(r)?`<div class="cbig">${eur(coteOf(r))}</div><div class="cvs">${vsCote(r)}</div><img src="${curveImg(r,130,30)}" width="130" height="30" alt="">`:has(r.market)?`<div class="cbig">${eur(num(r.market))}</div><div class="cnone">prix saisi à la main</div>`:`<div class="cnone">Pas encore de cote</div>`}<label class="cmk">Marché <input data-f="market" class="num mk" inputmode="decimal" value="${esc(r.market)}" placeholder="—" title="Prix du marché (modifiable)"></label><div class="cacts">${cbtn(r.id,coteOf(r)?'Actualiser':'Cote auto')}${o.length?`<button class="offbtn" data-id="${r.id}">${o.length} offres · dès ${eur(o[0].p)}</button>`:''}</div></td>
     <td class="${(()=>{if(!has(r.market))return '';const s=sale(r),k=num(r.market);return s<=k*0.95?'c-green':s<=k?'c-yellow':'c-red'})()}"><input data-f="sale" class="num" inputmode="decimal" value="${esc(r.sale)}" placeholder="${has(r.market)?num(r.market).toLocaleString('fr-FR'):'—'}"></td>
     <td class="marge ${m>=0?'pos':'neg'}">${eur(m)}</td>
     ${OC.polish?`<td>${sel('polish',r.polish,OPTS.polish)}</td>`:''}${OC.ship?`<td>${sel('ship',r.ship||'Non',OPTS.ship,'w-sel '+(r.ship==='À faire livrer'?'np':''))}</td>`:''}${OC.status?`<td><div class="status"><span class="dot s${si}"></span><select data-f="status" class="w-sel">${STATUTS.map(s=>`<option ${s===r.status?'selected':''}>${s}</option>`).join('')}</select></div></td>`:''}
@@ -345,6 +362,11 @@ function renderTable(){
   bindRows();
 }
 let dragId=null;
+const COLDEF={sel:30,img:76,montre:165,vendeur:100,pays:100,annee:66,taille:62,annonce:105,demande:90,fullset:100,etat:110,cote:160,vente:105,marge:95,polish:110,ship:110,status:130,acts:36};
+function colSaved(){try{return JSON.parse(localStorage.getItem('srcColW')||'{}')}catch(_){return {}}}
+function colWidths(keys){const sv=colSaved();const avail=Math.max(600,(document.getElementById('tablewrap')||{}).clientWidth||1150)-2;const fixed=keys.reduce((a,k)=>a+(sv[k]?sv[k]:0),0);const free=keys.filter(k=>!sv[k]);const fs=free.reduce((a,k)=>a+COLDEF[k],0);const f=fs?Math.min(1.25,Math.max(0.8,(avail-fixed)/fs)):1;const o={};keys.forEach(k=>o[k]=sv[k]||Math.round(COLDEF[k]*(['sel','acts'].includes(k)?1:f)));return o}
+function bindResize(){document.querySelectorAll('#tablewrap .rz').forEach(h=>h.onmousedown=e=>{e.preventDefault();e.stopPropagation();const k=h.dataset.rz;const col=document.querySelector('#tablewrap col[data-ck="'+k+'"]');const tb=document.querySelector('#tablewrap table');const x0=e.clientX,w0=col.getBoundingClientRect().width||parseFloat(col.style.width),t0=tb.getBoundingClientRect().width;h.classList.add('on');document.body.style.cursor='col-resize';
+ const mv=ev=>{const w=Math.max(30,Math.round(w0+ev.clientX-x0));col.style.width=w+'px';tb.style.width=(t0+w-w0)+'px'};const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);h.classList.remove('on');document.body.style.cursor='';const sv=colSaved();document.querySelectorAll('#tablewrap col[data-ck]').forEach(c=>sv[c.dataset.ck]=Math.round(parseFloat(c.style.width)));try{localStorage.setItem('srcColW',JSON.stringify(sv))}catch(_){}};document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up)})}
 function tblCols(){try{return JSON.parse(localStorage.getItem('srcCols')||'{}')}catch(_){return {}}}
 function bindGroups(){const d=cur();const G=d.groups||[];document.querySelectorAll('#tablewrap tr.grp').forEach(tr=>{const g=G.find(x=>x.id===tr.dataset.gid);if(!g)return;const n=tr.querySelector('.gname');n.onchange=()=>{g.name=n.value.trim()||'Intercalaire';save()};
  tr.addEventListener('dragover',e=>{if(!dragId)return;e.preventDefault();document.querySelectorAll('.drop-over').forEach(x=>x.classList.remove('drop-over'));tr.classList.add('drop-over')});
@@ -408,7 +430,7 @@ function openOffers(id){let r=cur().rows.find(x=>x.id===id),Z,isCat=false;if(r)Z
  document.body.appendChild(m);const close=()=>m.remove();m.querySelector('.x').onclick=close;m.onclick=e=>{if(e.target===m)close()};
  if(isCat)m.querySelectorAll('.pick2').forEach(b=>b.remove());m.querySelectorAll('.pick2').forEach(b=>b.onclick=()=>{const x=o[+b.dataset.i];if(r.link&&!confirm('Remplacer l\'annonce actuelle de cette ligne par celle-ci ?'))return;Object.assign(r,{link:x.u||r.link,asked:String(x.p),country:x.loc||r.country,seller:x.src==='WatchSalon'?'Boutique':x.pv?'Particulier':'Boutique'});save();close();render()})}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.offbtn');if(b)openOffers(b.dataset.id)});
-function bindRows(){bindDrag();bindGroups();const all=document.getElementById('selAll');if(all){const vis=[...document.querySelectorAll('#tablewrap tbody tr[data-id]')].map(tr=>cur().rows.find(x=>x.id===tr.dataset.id));all.checked=vis.length>0&&vis.every(r=>r&&r.sel);all.onchange=()=>{vis.forEach(r=>r.sel=all.checked);save();renderSel();renderTable()};}
+function bindRows(){bindDrag();bindGroups();bindResize();const all=document.getElementById('selAll');if(all){const vis=[...document.querySelectorAll('#tablewrap tbody tr[data-id]')].map(tr=>cur().rows.find(x=>x.id===tr.dataset.id));all.checked=vis.length>0&&vis.every(r=>r&&r.sel);all.onchange=()=>{vis.forEach(r=>r.sel=all.checked);save();renderSel();renderTable()};}
 document.querySelectorAll('#tablewrap tbody tr[data-id]').forEach(tr=>{const r=cur().rows.find(x=>x.id===tr.dataset.id);const c=tr.querySelector('.pick');c.onchange=()=>{r.sel=c.checked;save();renderSel();const a=document.getElementById('selAll');if(a)a.checked=[...document.querySelectorAll('.pick')].every(x=>x.checked)}});document.querySelectorAll('#tablewrap tbody tr[data-id]').forEach(tr=>{const r=cur().rows.find(x=>x.id===tr.dataset.id);
   tr.querySelectorAll('[data-f]').forEach(inp=>{const f=inp.dataset.f;const upd=()=>{r[f]=inp.value;save()};inp.addEventListener('input',upd);inp.addEventListener('change',()=>{upd();renderCards();renderTable();renderSide()})});
   tr.querySelector('.del').onclick=()=>{if(confirm('Supprimer cette montre ?')){cur().rows=cur().rows.filter(x=>x.id!==r.id);save();render()}};
