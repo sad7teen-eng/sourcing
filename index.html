@@ -16,6 +16,7 @@ aside{border-right:1px solid var(--line);padding:20px 12px;display:flex;flex-dir
 .brand{font-weight:600;font-size:14px;padding:4px 10px 18px;display:flex;align-items:center;gap:8px}
 .brand i{width:10px;height:10px;border-radius:50%;background:var(--text);display:inline-block}
 .app main.cat>*:not(#catview){display:none!important}#catview{display:none}.app main.cat>#catview{display:block}
+#dwant{margin:0 0 16px;padding:12px 14px;border:2px solid #1c1917;border-radius:12px;background:#fffbeb}#dwant label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#92400e;margin-bottom:6px}#dwantT{width:100%;box-sizing:border-box;border:0;background:transparent;font:inherit;font-size:16px;line-height:1.45;resize:none;outline:none;min-height:2.9em;padding:0}
 #catview{padding-bottom:80px}#catview .ctop{display:flex;align-items:center;gap:10px;margin-bottom:14px}#catview h2{margin:0;flex:1}
 #catview .cflt{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}#catview .cflt input,#catview .cflt select{border:1px solid #e7e5e4;background:#fff;border-radius:7px;padding:7px 9px;width:auto}#catview .cflt input.q{flex:1;min-width:240px}
 #catview table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e7e5e4;border-radius:10px;overflow:hidden}#catview th{text-align:left;font-weight:500;color:#78716c;font-size:12px;padding:9px 10px;border-bottom:1px solid #e7e5e4;background:#fafaf9}#catview td{padding:8px 10px;border-bottom:1px solid #f0efed;font-size:13px;vertical-align:middle}
@@ -176,6 +177,7 @@ button.btn,.mini,.linkbtn{min-height:40px}
       <button class="btn" data-paris="">Boutiques Paris</button>
       <button class="btn primary" id="addRow">Ajouter une montre</button>
     </div>
+    <div id="dwant"><label for="dwantT">Ce que veut le client</label><textarea id="dwantT" rows="2" placeholder="Ex. : Rolex 126234 cadran noir, index bâtons, lunette cannelée, full set, 2021 ou plus, budget 14 000 €, livraison Paris…"></textarea></div>
     <div class="stats" id="cards"></div>
     <div id="selbar"></div>
     <div class="filters" id="filters"></div>
@@ -595,7 +597,8 @@ function catForm(x){const isNew=!x;x=x||{status:'Disponible',condition:'Non pré
  g('f_ok').onclick=()=>{const brand=g('f_brand').value.trim(),ref=g('f_ref').value.trim();if(!brand||!ref){alert('La maison et la référence sont obligatoires.');return}
   const v={brand,ref,model:g('f_model').value.trim(),year:g('f_year').value.trim(),price:g('f_price').value.trim(),neg:g('f_neg').value,condition:g('f_cond').value,fullset:g('f_fs').value,location:g('f_loc').value.trim(),apporteur:g('f_app').value.trim(),status:g('f_st').value,notes:g('f_notes').value.trim(),img};
   if(isNew)catList().push(Object.assign({id:uid(),added:new Date().toISOString().slice(0,10)},v));else Object.assign(x,v);save();close();renderCatalog()};}
-function render(){const mainEl=document.querySelector('.app main');if(state.view==='contacts'){mainEl.classList.add('cat');renderContacts();renderSide();return}if(state.view==='cat'){mainEl.classList.add('cat');renderSide();renderCatalog();return}mainEl.classList.remove('cat');document.getElementById('catview').innerHTML='';const d=cur();state.active=d.id;document.getElementById('dossierName').textContent=d.name;renderSide();renderCards();renderFilters();renderTable();}
+function wantDraw(d){const t=document.getElementById('dwantT');if(!t)return;if(document.activeElement!==t)t.value=d.want||'';const fit=()=>{t.style.height='auto';t.style.height=t.scrollHeight+'px'};fit();t.oninput=()=>{const c=cur();c.want=t.value;fit();save()}}
+function render(){const mainEl=document.querySelector('.app main');if(state.view==='contacts'){mainEl.classList.add('cat');renderContacts();renderSide();return}if(state.view==='cat'){mainEl.classList.add('cat');renderSide();renderCatalog();return}mainEl.classList.remove('cat');document.getElementById('catview').innerHTML='';const d=cur();state.active=d.id;document.getElementById('dossierName').textContent=d.name;wantDraw(d);renderSide();renderCards();renderFilters();renderTable();}
 
 
 function exportRows(){const v=zrows();const s=v.filter(r=>r.sel);return (s.length?s:v.filter(r=>r.status!=='Écartée'))}
