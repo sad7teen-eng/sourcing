@@ -80,7 +80,7 @@
   }
 
   // ---------- Interface ----------
-  const css = `#srcPickBtn{position:fixed;right:22px;bottom:22px;z-index:2147483646;background:#1c1917;color:#fff;border:0;border-radius:999px;padding:13px 22px;font:600 15px system-ui,sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+  const css = `*{box-sizing:border-box}#srcPickBtn{position:fixed;right:22px;bottom:22px;z-index:2147483646;background:#1c1917;color:#fff;border:0;border-radius:999px;padding:13px 22px;font:600 15px system-ui,sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 #srcPickBtn:hover{background:#000}
 #srcPick{position:fixed;inset:0;z-index:2147483647;background:#fafaf9;display:flex;flex-direction:column;font:14px system-ui,sans-serif;color:#1c1917}
 #srcPick .hd{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid #e7e5e4;background:#fff}
@@ -96,16 +96,17 @@
 #srcPick .it.off .ck{background:#fff;color:#fff;border:2px solid #a8a29e}
 #srcPick .it .pr{font-weight:700;font-size:15px;padding:6px 8px 0}#srcPick .it .tx{font-size:11.5px;color:#57534e;padding:2px 8px 8px;line-height:1.3;max-height:3.9em;overflow:hidden}
 #srcPick .it a{position:absolute;top:6px;right:6px;background:rgba(255,255,255,.92);border-radius:6px;padding:2px 7px;font-size:11.5px;color:#1c1917;text-decoration:none}`;
-  const st = document.createElement('style'); st.textContent = css; (document.head || document.documentElement).appendChild(st);
+  // Tout est mis dans un « shadow DOM » pour que le style du site ne déforme pas la grille.
+  const mount = id => { const h = document.createElement('div'); h.id = id + 'Host'; h.style.cssText = 'all:initial'; const r = h.attachShadow({ mode: 'open' }); const st = document.createElement('style'); st.textContent = css.replace(/#srcPickBtn/g, '#srcPickBtn') ; r.appendChild(st); document.body.appendChild(h); return { h, r }; };
 
   const qOf = () => { const u = new URL(location.href); return u.searchParams.get(IS_WS ? 'q' : 'query') || u.searchParams.get('query') || u.searchParams.get('q') || ''; };
   const fmt = n => n.toLocaleString('fr-FR') + ' €';
   const esc = s => String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   async function open() {
-    const box = document.createElement('div'); box.id = 'srcPick';
+    const M = mount('srcPick'); const box = document.createElement('div'); box.id = 'srcPick';
     box.innerHTML = `<div class="hd"><b>Sourcing · ${SITE}</b><span class="st">Relevé des annonces…</span></div><div class="gr"></div>`;
-    document.body.appendChild(box);
+    M.r.appendChild(box); box.remove = () => M.h.remove();
     const stEl = box.querySelector('.st'); const status = s => { stEl.textContent = s; };
     let L = [];
     try { L = IS_WS ? await wsAll(status) : await c24All(status); } catch (e) { status('Erreur : ' + e.message); }
@@ -142,13 +143,13 @@
   }
 
   const addBtn = () => {
-    const has = document.getElementById('srcPickBtn');
+    const has = document.getElementById('srcPickBtnHost');
     if (!isSearch()) { if (has) has.remove(); return; }
     if (has || !document.body) return;
-    const b = document.createElement('button'); b.id = 'srcPickBtn'; b.textContent = 'Sourcing';
+    const M = mount('srcPickBtn'); const b = document.createElement('button'); b.id = 'srcPickBtn'; b.textContent = 'Sourcing';
     b.title = 'Choisir les annonces par photo et les envoyer au Sourcing';
-    b.onclick = () => { if (!document.getElementById('srcPick')) open(); };
-    document.body.appendChild(b);
+    b.onclick = () => { if (!document.getElementById('srcPickHost')) open(); };
+    M.r.appendChild(b);
   };
   addBtn(); setInterval(addBtn, 1500);
 })();
