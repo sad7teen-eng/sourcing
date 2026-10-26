@@ -89,14 +89,14 @@
 #srcPick button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;padding:8px 14px}
 #srcPick button.go{background:#1c1917;color:#fff;border-color:#1c1917;font-weight:600}
 #srcPick .st{color:#78716c;font-size:13px}
-#srcPick .gr{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;padding:14px 18px 40px;align-content:start}
+#srcPick .sc{flex:1;overflow:auto;min-height:0}#srcPick .gr{display:grid;grid-auto-rows:max-content;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;padding:14px 18px 40px;align-content:start}
 #srcPick .it{position:relative;background:#fff;border:3px solid #16a34a;border-radius:12px;overflow:hidden;cursor:pointer;user-select:none}
 #srcPick .it.off{border-color:#e7e5e4;opacity:.35;filter:grayscale(1)}
-#srcPick .it img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#f5f5f4}
-#srcPick .it .ck{position:absolute;top:6px;left:6px;width:24px;height:24px;border-radius:6px;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+#srcPick .it .ph{position:relative;width:100%;padding-top:100%;background:#f5f5f4}#srcPick .it .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+#srcPick .it .ck{z-index:2;position:absolute;top:6px;left:6px;width:24px;height:24px;border-radius:6px;background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
 #srcPick .it.off .ck{background:#fff;color:#fff;border:2px solid #a8a29e}
 #srcPick .it .pr{font-weight:700;font-size:15px;padding:6px 8px 0}#srcPick .it .tx{font-size:11.5px;color:#57534e;padding:2px 8px 8px;line-height:1.3;max-height:3.9em;overflow:hidden}
-#srcPick .it a{position:absolute;top:6px;right:6px;background:rgba(255,255,255,.92);border-radius:6px;padding:2px 7px;font-size:11.5px;color:#1c1917;text-decoration:none}`;
+#srcPick .it a{z-index:2;position:absolute;top:6px;right:6px;background:rgba(255,255,255,.92);border-radius:6px;padding:2px 7px;font-size:11.5px;color:#1c1917;text-decoration:none}`;
   // Tout est mis dans un « shadow DOM » pour que le style du site ne déforme pas la grille.
   const mount = id => { const h = document.createElement('div'); h.id = id + 'Host'; h.style.cssText = 'all:initial'; const r = h.attachShadow({ mode: 'open' }); const st = document.createElement('style'); st.textContent = css.replace(/#srcPickBtn/g, '#srcPickBtn') ; r.appendChild(st); document.body.appendChild(h); return { h, r }; };
 
@@ -106,7 +106,7 @@
 
   async function open() {
     const M = mount('srcPick'); const box = document.createElement('div'); box.id = 'srcPick';
-    box.innerHTML = `<div class="hd"><b>Sourcing · ${SITE}</b><span class="st">Relevé des annonces…</span></div><div class="gr"></div>`;
+    box.innerHTML = `<div class="hd"><b>Sourcing · ${SITE}</b><span class="st">Relevé des annonces…</span></div><div class="sc"><div class="gr"></div></div>`;
     M.r.appendChild(box); box.remove = () => M.h.remove();
     const stEl = box.querySelector('.st'); const status = s => { stEl.textContent = s; };
     let L = [];
@@ -118,7 +118,7 @@
       <span class="st cnt"></span><button class="all">Tout cocher</button><button class="none">Tout décocher</button>
       <span style="flex:1"></span><button class="cl">Annuler</button><button class="go">Valider</button>`;
     const gr = box.querySelector('.gr');
-    gr.innerHTML = L.map((x, i) => `<div class="it" data-i="${i}"><span class="ck">✓</span><a href="${esc(x.u)}" target="_blank" rel="noopener" title="Ouvrir l'annonce">Voir</a>${x.img ? `<img loading="lazy" src="${esc(x.img)}" referrerpolicy="no-referrer">` : '<img alt="">'}<div class="pr">${fmt(x.p)}${x.c ? ' <span style="font-weight:400;color:#78716c;font-size:12px">' + esc(x.c) + '</span>' : ''}${x.l ? ' <span style="font-weight:400;color:#78716c;font-size:12px">' + esc(x.l) + '</span>' : ''}</div><div class="tx">${esc(x.t)}</div></div>`).join('');
+    gr.innerHTML = L.map((x, i) => `<div class="it" data-i="${i}"><span class="ck">✓</span><a href="${esc(x.u)}" target="_blank" rel="noopener" title="Ouvrir l'annonce">Voir</a><div class="ph">${x.img ? `<img loading="lazy" src="${esc(x.img)}" referrerpolicy="no-referrer">` : ''}</div><div class="pr">${fmt(x.p)}${x.c ? ' <span style="font-weight:400;color:#78716c;font-size:12px">' + esc(x.c) + '</span>' : ''}${x.l ? ' <span style="font-weight:400;color:#78716c;font-size:12px">' + esc(x.l) + '</span>' : ''}</div><div class="tx">${esc(x.t)}</div></div>`).join('');
     const cnt = () => { const n = L.filter(x => x.on).length; box.querySelector('.cnt').textContent = n + ' gardée' + (n > 1 ? 's' : '') + ' sur ' + L.length; box.querySelector('.go').textContent = 'Valider (' + n + ')'; };
     const paint = () => gr.querySelectorAll('.it').forEach(el => el.classList.toggle('off', !L[+el.dataset.i].on));
     gr.onclick = e => { if (e.target.closest('a')) return; const el = e.target.closest('.it'); if (!el) return; const x = L[+el.dataset.i]; x.on = !x.on; el.classList.toggle('off', !x.on); cnt(); };
