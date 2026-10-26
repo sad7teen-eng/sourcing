@@ -15,7 +15,8 @@
     doc.querySelectorAll('.js-listing-item-container, .js-article-item-container, .article-item-container').forEach(c => {
       const a = c.querySelector('a[href*="--id"]'); if (!a) return;
       const href = a.getAttribute('href') || ''; const id = (href.match(/--id(\d+)/) || [])[1]; if (!id || M.has(id)) return;
-      const t = (c.innerText || c.textContent || '').replace(/Aller au feuillet \d+/g, ' ').replace(/\s+/g, ' ').trim();
+      c.querySelectorAll('script,style,template,noscript').forEach(n => n.remove());
+      const t = (c.textContent || '').replace(/Aller au feuillet \d+/g, ' ').replace(/\s+/g, ' ').trim();
       let p = 0;
       for (const m of t.matchAll(/(?<![\d.\-A-Za-z€$£])(?:€\s?(\d{1,3}(?:[\s  .,]\d{3})+)|(\d{1,3}(?:[\s  .,]\d{3})+)\s?€)/g)) {
         const af = t.slice(m.index + m[0].length), bf = t.slice(0, m.index);
@@ -82,10 +83,10 @@
   // ---------- Interface ----------
   const css = `*{box-sizing:border-box}#srcPickBtn{position:fixed;right:22px;bottom:22px;z-index:2147483646;background:#1c1917;color:#fff;border:0;border-radius:999px;padding:13px 22px;font:600 15px system-ui,sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 #srcPickBtn:hover{background:#000}
-#srcPick{position:fixed;inset:0;z-index:2147483647;background:#fafaf9;display:flex;flex-direction:column;font:14px system-ui,sans-serif;color:#1c1917}
+#srcPick{color-scheme:light;position:fixed;inset:0;z-index:2147483647;background:#fafaf9;display:flex;flex-direction:column;font:14px system-ui,sans-serif;color:#1c1917}
 #srcPick .hd{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid #e7e5e4;background:#fff}
-#srcPick .hd b{font-size:16px}#srcPick .hd input{font:inherit;padding:7px 10px;border:1px solid #d6d3d1;border-radius:8px;width:200px}
-#srcPick button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid #d6d3d1;background:#fff;padding:8px 14px}
+#srcPick .hd b{font-size:16px}#srcPick .hd input{font:inherit;padding:7px 10px;border:1px solid #d6d3d1;border-radius:8px;width:200px;background:#fff;color:#1c1917}
+#srcPick button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid #d6d3d1;background:#fff;color:#1c1917;padding:8px 14px}
 #srcPick button.go{background:#1c1917;color:#fff;border-color:#1c1917;font-weight:600}
 #srcPick .st{color:#78716c;font-size:13px}
 #srcPick .gr{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;padding:14px 18px 40px;align-content:start}
